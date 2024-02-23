@@ -1,4 +1,4 @@
-#TODO: enharmony grouping system: namedtuple, simplify
+#TODO: enharmony grouping system: namedtuple, simplify, GTR tab, piano keys, chords, chord progressions,
 import string
 
 valid_names = string.ascii_lowercase[:6]
@@ -35,21 +35,23 @@ while not (circle_of_fifths[0] == circle_of_fifths[-1] and len(circle_of_fifths)
         for x in all_notes_db:
             if all_notes_db[x] == circle_of_fifths[-1]:
                 circle_of_fifths.append(all_notes_db[x+7])
+# alt sharps/flats der from fifths and fifths[::-1] ???
 circle_of_fourths = circle_of_fifths[::-1]
 circle_of_sharps = circle_of_fifths[6:]
 circle_of_flats = circle_of_fourths[2:9]
 
+# C major exclude from both?
 sharp_major_scales = {}
 for i in len(circle_of_sharps):
-    key = sharp_major_scales[circle_of_fifths[i+1][0]] or sharp_major_scales[circle_of_fifths[i+1][2]] 
-    value = circle_of_sharps[:i+1][0] or circle_of_sharps[:i+1][2]
+    key = sharp_major_scales[circle_of_fifths[i][0]] or sharp_major_scales[circle_of_fifths[i][2]] 
+    value = circle_of_sharps[:i][0] or circle_of_sharps[:i][2]
     sharp_major_scales[key] = value
-
+# fourths / flats exclude somehow?
 flat_major_scales = {}
 for j in len(circle_of_flats):
-    key = flat_major_scales[circle_of_fourths[i+1][0]] or flat_major_scales[circle_of_fourths[i+1][1]
+    key = flat_major_scales[circle_of_fourths[i][0]] or flat_major_scales[circle_of_fourths[i][1]
     key = key if key != "B" else "Cb"
-    value = circle_of_flats[:i+1][0] or circle_of_flats[:i+1][1]
+    value = circle_of_flats[:i][0] or circle_of_flats[:i][1]
     flat_major_scales[key] = value
 
 for i in sharp_major_scales:
