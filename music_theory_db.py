@@ -36,13 +36,14 @@ for symbol in valid_symbols:
         if new_step in steps_names_db:
             steps_names_db[new_step].append(new_name)
         else:
-            steps_names_db[new_step] = list(None, new_name) # other solution?
+            steps_names_db[new_step] = list(None, new_name) # named solution?
 
 ### CIRCLES OF FIFTH, FOURTH, SHARPS, FLATS
 all_fifths = []
 while not (all_fifths and all_fifths[0] == all_fifths[-1] and len(all_fifths) != 1):
     if not all_fifths:
-        all_fifths.append(steps_names_db[0]) # alt: less explicitly
+        first = find_step(names_order[0])
+        all_fifths.append(first)
     else:
         last_step = find_step(all_fifths[-1])
         next_step = last_step + 7 # alt ref: one fifth up
@@ -59,7 +60,7 @@ flat_major_scales = {}
 for i in range(8):
     key_1 = circle_of_fifths[i+1]
     key_2 = circle_of_fourths[i+1]
-    key_2 = key_2 if key_2 != "B" else "Cb" #TODO: make better
+    key_2 = key_2 if key_2 != "B" else "Cb" #TODO: make into objs
     values_1 = circle_of_sharps[:i]
     values_2 = circle_of_flats[:i]
     sharp_major_scales[key_1] = values_1

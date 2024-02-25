@@ -19,14 +19,14 @@ while not note_selected:
 
 
 # ENTER ADDITIONAL MEMBERS
+#TODO: commas etc rm from input
 more_notes_selected = False
 while not more_notes_selected:
 	response_3 = input("enter sharp or flat note(s) you know belongs in the scale: ").casefold()
-	response_3 = response_3.split()
-	if all(x in response_3 for y in all_notes):
+	response_3 = set(response_3.split())
+	if response_3.issubset(all_existing_notes):
 		more_notes_selected = True
-	if more_notes_selected:
-		user_selection.extend(response_3)	
+		user_selection.extend(response_3)
 	else:
 		print("Something's incorrect. Try again.")
 
