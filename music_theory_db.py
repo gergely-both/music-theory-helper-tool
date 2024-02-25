@@ -7,7 +7,9 @@ valid_symbols = {"b": -1, "#": +1}
 major_steps = [0, 2, 4, 5, 7, 9, 11]
 major_mode_names = ["ionian", "dorian", "phrygian", "lydian", "mixolydian", "aeolian / minor", "locrian"]
 steps_names_db = {}
+all_existing_notes = set(x.casefold() for x in *steps_names_db.values())
 all_major_scales = {}
+all_major_scales_raw = {}
 all_major_modes = {}
 
 def find_step(note):
@@ -63,13 +65,15 @@ for i in range(8):
     sharp_major_scales[key_1] = values_1
     flat_major_scales[key_2] = values_2
 
-### ALL SCALE NAMES AND ALL THEIR MEMBERS
+### ALL SCALE NAMES AND ALL THEIR MEMBERS: C MAJOR, SHARPS, FLATS
 all_major_scales[names_order[0]] = [x for x in names_order]
 for x,y in zip(sharp_major_scales, flat_major_scales):
     key_1 = x
     key_2 = y
     values_1 = []
+    values_1_raw = []
     values_2 = []
+    values_2_raw = []
     base_1 = find_step(key_1)
     base_2 = find_step(key_2)
     for step in major_steps:
@@ -77,9 +81,14 @@ for x,y in zip(sharp_major_scales, flat_major_scales):
         many_names_2 = steps_names_db[(base_2 + step)%12]
         values_1.append(find_correct_name(many_names_1, sharp_major_scales)
         values_2.append(find_correct_name(many_names_2, flat_major_scales))
+        values_1_raw.append(many_names_1)
+        values_2_raw.append(many_names_2)
         all_major_scales[key_1] = values_1
         all_major_scales[key_2] = values_2
+        all_major_scales_raw[key_1] = values_1_raw
+        all_major_scales_raw[key_2] = values_2_raw
 
+### ALL MAJOR MODES GEN
 all_major_modes = {}
 for n in range(len(major_mode_names)):
     for z in all_major_scales:
