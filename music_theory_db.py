@@ -17,7 +17,7 @@ def find_step(note):
         if note in steps_names_db[x]:
             return x
 
-def find_correct_name(enh_names, scale_type):
+def shrink_name(enh_names, scale_type):
     enh_names = set(enh_names)
     for x in scale_type:
         mod_names = set(scale_type[x])
@@ -38,7 +38,7 @@ for symbol in valid_symbols:
         else:
             steps_names_db[new_step] = list(None, new_name) # named solution?
 
-### CIRCLES OF FIFTH, FOURTH, SHARPS, FLATS
+### CIRCLE OF FIFTHS, FOURTHS, SHARPS AND FLATS
 all_fifths = []
 while not (all_fifths and all_fifths[0] == all_fifths[-1] and len(all_fifths) != 1):
     if not all_fifths:
@@ -80,14 +80,14 @@ for x,y in zip(sharp_major_scales, flat_major_scales):
     for step in major_steps:
         many_names_1 = steps_names_db[(base_1 + step)%12]
         many_names_2 = steps_names_db[(base_2 + step)%12]
-        values_1.append(find_correct_name(many_names_1, sharp_major_scales)
-        values_2.append(find_correct_name(many_names_2, flat_major_scales))
         values_1_raw.append(many_names_1)
         values_2_raw.append(many_names_2)
-        all_major_scales[key_1] = values_1
-        all_major_scales[key_2] = values_2
+        values_1.append(shrink_name(many_names_1, sharp_major_scales)
+        values_2.append(shrink_name(many_names_2, flat_major_scales))
         all_major_scales_raw[key_1] = values_1_raw
         all_major_scales_raw[key_2] = values_2_raw
+        all_major_scales[key_1] = values_1
+        all_major_scales[key_2] = values_2
 
 ### ALL MAJOR MODES GEN
 all_major_modes = {}
