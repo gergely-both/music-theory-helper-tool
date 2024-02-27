@@ -1,4 +1,3 @@
-#TODO: editable named enharmony grouping, guitar tab, piano keys, chords, chord progressions, OOP, 
 import string
 
 valid_names = string.ascii_uppercase[:6]

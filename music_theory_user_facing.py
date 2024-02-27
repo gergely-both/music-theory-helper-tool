@@ -1,13 +1,13 @@
 import string
 from music_theory_db.py import all_major_scales, all_major_scales_raw, all_major_modes, all_existing_notes
 
-user_selection = []
-
 def extend_name(name):
     for i in all_notes_db:
         if name in all_notes_db[i]:
             return all_notes_db[i]
 
+
+user_selection = []
 
 # ENTER FIRST MEMBER
 note_selected = False
@@ -30,13 +30,15 @@ while not more_notes_selected:
 	else:
 		print("Something's incorrect. Try again.")
 
-# QUERY SYSTEM BEGINS
-# TODO: find scale, find mode, find first note in correct db, filter repeating inputs!, 
+# MAJOR SCALE AND MODE SEARCH SYSTEM
 user_selection = [extend_name(x) for x in user_selection]
-for scale in all_major_scales_raw:
-    if set(user_selection).issubset(set(all_major_scales_raw[scale])):
-
-        print(f"{scale} Major scale: ", all_major_scales[scale])
-        
-        for mode in all_major_modes:
+for scale_name in all_major_scales_raw:
+    if set(user_selection).issubset(set(all_major_scales_raw[scale_name])):
+        scale_notes = all_major_scales[scale_name]
+        # print(f"{scale_name} Major scale: {scale_notes}")
+        for mode_name in all_major_modes:
+            mode_notes = all_major_modes[mode_name]
+            if set(scale_notes) == set(mode_notes):
+                if any(name == mode_notes[0]for name in user_selection[0]):
+                    # print(f"{mode_name} mode: {mode_notes}")
 
