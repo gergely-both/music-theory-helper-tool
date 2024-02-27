@@ -1,5 +1,5 @@
 import string
-from music_theory_db.py import all_major_scales, all_major_scales_raw, all_major_modes, all_existing_notes
+from music_theory_db import all_existing_notes, all_major_scales, all_major_scales_raw, all_major_modes
 
 def extend_name(name):
     for i in all_notes_db:

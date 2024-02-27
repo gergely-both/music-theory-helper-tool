@@ -23,11 +23,11 @@ def shrink_name(enh_names, scale_type):
         if mod_names & enh_names:
             return mod_names & enh_names
 
-for x,y in zip(major_steps, names_order):
+for x, y in zip(major_steps, names_order):
     steps_names_db[x] = list(y)
 for symbol in valid_symbols:
     symbol_value = valid_symbols[symbol]
-    modifier = (12 + symbol_value) % 12 # other solution?
+    modifier = (12 + symbol_value) % 12 # make into fn or sth.
     for name in names_order:
         orig_step = find_step(name)
         new_step = orig_step + modifier
@@ -45,7 +45,7 @@ while not (all_fifths and all_fifths[0] == all_fifths[-1] and len(all_fifths) !=
         all_fifths.append(first)
     else:
         last_step = find_step(all_fifths[-1])
-        next_step = last_step + 7 # alt ref: one fifth up
+        next_step = last_step + 7 # express one fifth up somehow
         all_fifths.append(steps_names_db[next_step])
 circle_of_fifths = [(x[0] or x[2]) for x in all_fifths]
 circle_of_sharps = [x[2] for x in all_fifths[6:]]
@@ -59,7 +59,7 @@ flat_major_scales = {}
 for i in range(8):
     key_1 = circle_of_fifths[i+1]
     key_2 = circle_of_fourths[i+1]
-    key_2 = key_2 if key_2 != "B" else "Cb" #TODO: make into objs
+    key_2 = key_2 if key_2 != "B" else "Cb" #TODO: make notes into objs
     values_1 = circle_of_sharps[:i]
     values_2 = circle_of_flats[:i]
     sharp_major_scales[key_1] = values_1
@@ -67,7 +67,7 @@ for i in range(8):
 
 ### ALL SCALE NAMES AND ALL THEIR MEMBERS: C MAJOR, SHARPS, FLATS
 all_major_scales[names_order[0]] = [x for x in names_order]
-for x,y in zip(sharp_major_scales, flat_major_scales):
+for x, y in zip(sharp_major_scales, flat_major_scales):
     key_1 = x
     key_2 = y
     values_1 = []

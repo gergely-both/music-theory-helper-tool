@@ -1,4 +1,4 @@
-* TODO editable named enharmony grouping
+* TODO editable named enharmony grouping if possible
 * TODO guitar tab view
 * TODO piano keys view
 * TODO chords and chord progressions
