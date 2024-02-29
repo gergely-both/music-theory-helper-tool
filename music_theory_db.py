@@ -1,12 +1,13 @@
 import string
+from collections import defaultdict
 
-valid_names = string.ascii_uppercase[:6]
+valid_names = string.ascii_uppercase[:7]
 names_order = valid_names[2:] + valid_names[:2]
 valid_symbols = {"b": -1, "#": +1}
 major_steps = [0, 2, 4, 5, 7, 9, 11]
 major_mode_names = ["ionian", "dorian", "phrygian", "lydian", "mixolydian", "aeolian / minor", "locrian"]
-steps_names_db = {}
-all_existing_notes = set(x.casefold() for x in *steps_names_db.values())
+steps_names_db = defaultdict(dict)
+all_existing_notes = set(str(x).casefold() for x in [steps_names_db.values()])
 all_major_scales = {}
 all_major_scales_raw = {}
 all_major_modes = {}
@@ -24,29 +25,32 @@ def shrink_name(enh_names, scale_type):
             return mod_names & enh_names
 
 for x, y in zip(major_steps, names_order):
-    steps_names_db[x] = list(y)
+    steps_names_db[x]["unsigned"] = y
+
 for symbol in valid_symbols:
     symbol_value = valid_symbols[symbol]
     modifier = (12 + symbol_value) % 12 # make into fn or sth.
     for name in names_order:
+        print(name)
         orig_step = find_step(name)
-        new_step = orig_step + modifier
+        new_step = (orig_step + modifier) % 12
         new_name = name + symbol
-        if new_step in steps_names_db:
-            steps_names_db[new_step].append(new_name)
-        else:
-            steps_names_db[new_step] = list(None, new_name) # named solution?
+        steps_names_db[new_step][symbol] = new_name
 
+print(steps_names_db)            
 ### CIRCLE OF FIFTHS, FOURTHS, SHARPS AND FLATS
 all_fifths = []
 while not (all_fifths and all_fifths[0] == all_fifths[-1] and len(all_fifths) != 1):
     if not all_fifths:
-        first = find_step(names_order[0])
+        first = steps_names_db[0]
         all_fifths.append(first)
     else:
-        last_step = find_step(all_fifths[-1])
-        next_step = last_step + 7 # express one fifth up somehow
+        last_step = find_step(all_fifths[-1][-1])
+        next_step = (last_step + 7) % 12  # express one fifth up somehow
         all_fifths.append(steps_names_db[next_step])
+
+print(all_fifths)
+        
 circle_of_fifths = [(x[0] or x[2]) for x in all_fifths]
 circle_of_sharps = [x[2] for x in all_fifths[6:]]
 all_fourths = all_fifths[::-1]
@@ -81,7 +85,7 @@ for x, y in zip(sharp_major_scales, flat_major_scales):
         many_names_2 = steps_names_db[(base_2 + step)%12]
         values_1_raw.append(many_names_1)
         values_2_raw.append(many_names_2)
-        values_1.append(shrink_name(many_names_1, sharp_major_scales)
+        values_1.append(shrink_name(many_names_1, sharp_major_scales))
         values_2.append(shrink_name(many_names_2, flat_major_scales))
         all_major_scales_raw[key_1] = values_1_raw
         all_major_scales_raw[key_2] = values_2_raw

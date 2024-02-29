@@ -35,10 +35,10 @@ user_selection = [extend_name(x) for x in user_selection]
 for scale_name in all_major_scales_raw:
     if set(user_selection).issubset(set(all_major_scales_raw[scale_name])):
         scale_notes = all_major_scales[scale_name]
-        # print(f"{scale_name} Major scale: {scale_notes}")
+        print(f"{scale_name} Major scale: {scale_notes}")
         for mode_name in all_major_modes:
             mode_notes = all_major_modes[mode_name]
             if set(scale_notes) == set(mode_notes):
                 if any(name == mode_notes[0]for name in user_selection[0]):
-                    # print(f"{mode_name} mode: {mode_notes}")
+                    print(f"{mode_name} mode: {mode_notes}")
 
