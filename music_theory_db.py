@@ -17,6 +17,7 @@ def find_step(note):
         if note in steps_names_db[x].values():
             return x
 
+# TODO: fix, outputs b# instead of plain c - always
 def shrink_name(enh_names, scale_type):
     enh_names = set(enh_names)
     for x in scale_type:
@@ -56,20 +57,25 @@ all_fourths = all_fifths[::-1]
 circle_of_fourths = [x.get("unsigned") or x.get("b") for x in all_fourths]
 circle_of_flats = [x.get("b") for x in all_fourths[2:9]]
 
+
 ### SHARPENED / FLATTENED MAJOR SCALES START / NAME AND SHARP / FLAT MEMBERS
 sharp_major_scales = {}
 flat_major_scales = {}
-for i in range(8):
+for i in range(7):
     key_1 = circle_of_fifths[i+1]
     key_2 = circle_of_fourths[i+1]
     key_2 = key_2 if key_2 != "B" else "Cb"
-    values_1 = circle_of_sharps[:i]
-    values_2 = circle_of_flats[:i]
+    values_1 = circle_of_sharps[:i+1]
+    values_2 = circle_of_flats[:i+1]
     sharp_major_scales[key_1] = values_1
     flat_major_scales[key_2] = values_2
 
+
+
+
 ### ALL SCALE NAMES AND ALL THEIR MEMBERS: C MAJOR, SHARPS, FLATS
 all_major_scales[names_order[0]] = [x for x in names_order]
+
 for x, y in zip(sharp_major_scales, flat_major_scales):
     key_1 = x
     key_2 = y
@@ -80,17 +86,20 @@ for x, y in zip(sharp_major_scales, flat_major_scales):
     base_1 = find_step(key_1)
     base_2 = find_step(key_2)
     for step in major_steps:
-        many_names_1 = steps_names_db[(base_1 + step)%12]
-        many_names_2 = steps_names_db[(base_2 + step)%12]
-        values_1_raw.append(many_names_1)
-        values_2_raw.append(many_names_2)
-        values_1.append(shrink_name(many_names_1, sharp_major_scales))
-        values_2.append(shrink_name(many_names_2, flat_major_scales))
+        all_names_1 = list(steps_names_db[(base_1 + step) % 12].values())
+        all_names_2 = list(steps_names_db[(base_2 + step) % 12].values())
+        single_name_1 = all_names_1 if len(all_names_1) == 1 else shrink_name(all_names_1, sharp_major_scales)
+        single_name_2 = all_names_2 if len(all_names_2) == 1 else shrink_name(all_names_2, flat_major_scales)
+        values_1_raw.append(all_names_1)
+        values_2_raw.append(all_names_2)
+        values_1.append(single_name_1)
+        values_2.append(single_name_2)
         all_major_scales_raw[key_1] = values_1_raw
         all_major_scales_raw[key_2] = values_2_raw
         all_major_scales[key_1] = values_1
         all_major_scales[key_2] = values_2
-
+print(f"{all_major_scales}")
+        
 ### ALL MAJOR MODES GEN
 all_major_modes = {}
 for n in range(len(major_mode_names)):
@@ -98,4 +107,3 @@ for n in range(len(major_mode_names)):
         scale = all_major_scales[z]
         new_scale = scale[n:] + scale[:n]
         name = z + major_mode_names[n]
-
