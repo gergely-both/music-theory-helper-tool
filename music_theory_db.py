@@ -1,3 +1,4 @@
+# key vs scale, 
 import string
 from collections import defaultdict
 
@@ -17,13 +18,21 @@ def find_step(note):
         if note in steps_names_db[x].values():
             return x
 
-# TODO: fix, outputs b# instead of plain c - always
-def shrink_name(enh_names, scale_type):
-    enh_names = set(enh_names)
-    for x in scale_type:
-        mod_names = set(scale_type[x])
-        if mod_names & enh_names:
-            return mod_names & enh_names
+
+def extend_name(name):
+    for x in steps_names_db:
+        many_names = list(steps_names_db[x].values())
+        if name in many_names:
+            return many_names
+
+
+def correct_name(current_step, sharps_or_flats=False):
+    all_names = steps_names_db[current_step]
+    if sharps_or_flats:
+        return set(all_names.values()) & set(sharps_or_flats) or all_names["unsigned"]
+    else:
+        return list(all_names.values())
+
 
 for x, y in zip(major_steps, names_order):
     steps_names_db[x]["unsigned"] = y
@@ -35,7 +44,6 @@ for symbol in valid_symbols:
         new_step = (orig_step + modifier) %12
         new_name = name + symbol
         steps_names_db[new_step][symbol] = new_name
-
 for x in steps_names_db:
     notes = list(steps_names_db[x].values())
     for note in notes:
@@ -62,20 +70,18 @@ circle_of_flats = [x.get("b") for x in all_fourths[2:9]]
 sharp_major_scales = {}
 flat_major_scales = {}
 for i in range(7):
-    key_1 = circle_of_fifths[i+1]
-    key_2 = circle_of_fourths[i+1]
-    key_2 = key_2 if key_2 != "B" else "Cb"
-    values_1 = circle_of_sharps[:i+1]
-    values_2 = circle_of_flats[:i+1]
-    sharp_major_scales[key_1] = values_1
-    flat_major_scales[key_2] = values_2
-
-
+    sharp_scale_name = circle_of_fifths[i+1]
+    flat_scale_name = circle_of_fourths[i+1]
+    flat_scale_name = flat_scale_name if flat_scale_name != "B" else "Cb"
+    sharp_notes = circle_of_sharps[:i+1]
+    flat_notes = circle_of_flats[:i+1]
+    sharp_major_scales[sharp_scale_name] = sharp_notes
+    flat_major_scales[flat_scale_name] = flat_notes
 
 
 ### ALL SCALE NAMES AND ALL THEIR MEMBERS: C MAJOR, SHARPS, FLATS
 all_major_scales[names_order[0]] = [x for x in names_order]
-
+all_major_scales_raw[names_order[0]] = [extend_name(x) for x in names_order]
 for x, y in zip(sharp_major_scales, flat_major_scales):
     key_1 = x
     key_2 = y
@@ -86,20 +92,25 @@ for x, y in zip(sharp_major_scales, flat_major_scales):
     base_1 = find_step(key_1)
     base_2 = find_step(key_2)
     for step in major_steps:
-        all_names_1 = list(steps_names_db[(base_1 + step) % 12].values())
-        all_names_2 = list(steps_names_db[(base_2 + step) % 12].values())
-        single_name_1 = all_names_1 if len(all_names_1) == 1 else shrink_name(all_names_1, sharp_major_scales)
-        single_name_2 = all_names_2 if len(all_names_2) == 1 else shrink_name(all_names_2, flat_major_scales)
-        values_1_raw.append(all_names_1)
-        values_2_raw.append(all_names_2)
-        values_1.append(single_name_1)
-        values_2.append(single_name_2)
+        current_step_1 = (base_1 + step) % 12
+        current_step_2 = (base_2 + step) % 12
+        all_names_1 = correct_name(current_step_1)
+        all_names_2 = correct_name(current_step_2)
+        correct_name_1 = correct_name(current_step_1, sharp_major_scales[key_1])
+        correct_name_2 = correct_name(current_step_2, flat_major_scales[key_2])
+        values_1_raw.extend(all_names_1)
+        values_2_raw.extend(all_names_2)
+        values_1.append(correct_name_1)
+        values_2.append(correct_name_2)
         all_major_scales_raw[key_1] = values_1_raw
         all_major_scales_raw[key_2] = values_2_raw
         all_major_scales[key_1] = values_1
         all_major_scales[key_2] = values_2
-print(f"{all_major_scales}")
-        
+
+# print(all_major_scales)
+# print(all_major_scales_raw)        
+
+
 ### ALL MAJOR MODES GEN
 all_major_modes = {}
 for n in range(len(major_mode_names)):
