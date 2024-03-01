@@ -1,3 +1,4 @@
+# TODO: edit view: note letter uppercase, fix modes, fix input pruning strictness, 
 import string
 from music_theory_db import all_existing_notes, all_major_scales, all_major_scales_raw, all_major_modes, steps_names_db, extend_name
 
@@ -25,19 +26,17 @@ while not more_notes_selected:
     else:
         print("Something's incorrect. Try again.")
 
-# TODO: fix
-# MAJOR SCALE AND MODE SEARCH SYSTEM
-user_selection = [extend_name(x) for x in user_selection]
-for scale_name in all_major_scales_raw:
 
-    print(scale_name)
-    print(user_selection)
-    print(set(user_selection))
-    print(set(all_major_scales_raw[scale_name]))
-    
-    if (set(user_selection)).issubset(set(all_major_scales_raw[scale_name])):
-        scale_notes = all_major_scales[scale_name]
-        print(f"{scale_name} Major scale: {scale_notes}")
+# MAJOR SCALE AND MODE SEARCH SYSTEM
+user_selection_temp = []
+for x in user_selection:
+    user_selection_temp.extend(extend_name(x))
+user_selection = user_selection_temp
+
+for scale_name in all_major_scales_raw:
+    scale_notes = all_major_scales_raw[scale_name]
+    if (set(user_selection)).issubset(set(scale_notes)):
+        print(f"{scale_name} Major scale: {scale_notes}") # make into view fn
         for mode_name in all_major_modes:
             mode_notes = all_major_modes[mode_name]
             if set(scale_notes) == set(mode_notes):

@@ -1,14 +1,14 @@
-# key vs scale, 
+# key or scale (terminology), 
 import string
 from collections import defaultdict
 
-valid_names = string.ascii_uppercase[:7]
+valid_names = string.ascii_lowercase[:7]
 names_order = valid_names[2:] + valid_names[:2]
 valid_symbols = {"b": -1, "#": +1}
 major_steps = [0, 2, 4, 5, 7, 9, 11]
 major_mode_names = ["ionian", "dorian", "phrygian", "lydian", "mixolydian", "aeolian / minor", "locrian"]
 steps_names_db = defaultdict(dict)
-all_existing_notes = set() # set(str(x).casefold() for x in [steps_names_db.values().values()])
+all_existing_notes = set()
 all_major_scales = {}
 all_major_scales_raw = {}
 all_major_modes = {}
@@ -17,7 +17,6 @@ def find_step(note):
     for x in steps_names_db:
         if note in steps_names_db[x].values():
             return x
-
 
 def extend_name(name):
     for x in steps_names_db:
@@ -47,7 +46,7 @@ for symbol in valid_symbols:
 for x in steps_names_db:
     notes = list(steps_names_db[x].values())
     for note in notes:
-        all_existing_notes.add(note.casefold())
+        all_existing_notes.add(note)
 
 
 ### CIRCLE OF FIFTHS, FOURTHS, SHARPS AND FLATS
@@ -81,7 +80,13 @@ for i in range(7):
 
 ### ALL SCALE NAMES AND ALL THEIR MEMBERS: C MAJOR, SHARPS, FLATS
 all_major_scales[names_order[0]] = [x for x in names_order]
-all_major_scales_raw[names_order[0]] = [extend_name(x) for x in names_order]
+all_major_scales_raw[names_order[0]] = []
+raw_scale_notes = [extend_name(x) for x in names_order]
+for notes in raw_scale_notes:
+    for note in notes:
+        all_major_scales_raw[names_order[0]].append(note)
+
+    
 for x, y in zip(sharp_major_scales, flat_major_scales):
     key_1 = x
     key_2 = y
@@ -106,9 +111,6 @@ for x, y in zip(sharp_major_scales, flat_major_scales):
         all_major_scales_raw[key_2] = values_2_raw
         all_major_scales[key_1] = values_1
         all_major_scales[key_2] = values_2
-
-# print(all_major_scales)
-# print(all_major_scales_raw)        
 
 
 ### ALL MAJOR MODES GEN
