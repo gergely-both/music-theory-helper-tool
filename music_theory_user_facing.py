@@ -1,11 +1,15 @@
 import string
-from music_theory_db import all_existing_notes, all_major_scales, all_major_scales_raw, all_major_modes
+from music_theory_db import all_existing_notes, all_major_scales, all_major_scales_raw, all_major_modes, steps_names_db
+
+
+print(all_major_scales)
+
 
 def extend_name(name):
-    for i in all_notes_db:
-        if name in all_notes_db[i]:
-            return all_notes_db[i]
-
+    for x in steps_names_db:
+        many_names = list(steps_names_db[x].values())
+        if name in many_names:
+            return many_names
 
 user_selection = []
 
@@ -23,9 +27,9 @@ while not note_selected:
 more_notes_selected = False
 while not more_notes_selected:
 	response_2 = input("enter sharp or flat note(s) you know play well along it (comma-separated): ").casefold()
-	response_2 = [x.strip() for x in response_2.split(",")]
+	response_2 = set(x.strip() for x in response_2.split(","))
 	if response_2.issubset(all_existing_notes):
-		user_selection.extend(response_3)
+		user_selection.extend(response_2)
 		more_notes_selected = True
 	else:
 		print("Something's incorrect. Try again.")

@@ -7,14 +7,14 @@ valid_symbols = {"b": -1, "#": +1}
 major_steps = [0, 2, 4, 5, 7, 9, 11]
 major_mode_names = ["ionian", "dorian", "phrygian", "lydian", "mixolydian", "aeolian / minor", "locrian"]
 steps_names_db = defaultdict(dict)
-all_existing_notes = set(str(x).casefold() for x in [steps_names_db.values()])
+all_existing_notes = set() # set(str(x).casefold() for x in [steps_names_db.values().values()])
 all_major_scales = {}
 all_major_scales_raw = {}
 all_major_modes = {}
 
 def find_step(note):
     for x in steps_names_db:
-        if note in steps_names_db[x]:
+        if note in steps_names_db[x].values():
             return x
 
 def shrink_name(enh_names, scale_type):
@@ -26,36 +26,35 @@ def shrink_name(enh_names, scale_type):
 
 for x, y in zip(major_steps, names_order):
     steps_names_db[x]["unsigned"] = y
-
 for symbol in valid_symbols:
     symbol_value = valid_symbols[symbol]
-    modifier = (12 + symbol_value) % 12 # make into fn or sth.
+    modifier = (12 + symbol_value) %12
     for name in names_order:
-        print(name)
         orig_step = find_step(name)
-        new_step = (orig_step + modifier) % 12
+        new_step = (orig_step + modifier) %12
         new_name = name + symbol
         steps_names_db[new_step][symbol] = new_name
 
-print(steps_names_db)            
+for x in steps_names_db:
+    notes = list(steps_names_db[x].values())
+    for note in notes:
+        all_existing_notes.add(note.casefold())
+
+
 ### CIRCLE OF FIFTHS, FOURTHS, SHARPS AND FLATS
 all_fifths = []
 while not (all_fifths and all_fifths[0] == all_fifths[-1] and len(all_fifths) != 1):
     if not all_fifths:
-        first = steps_names_db[0]
-        all_fifths.append(first)
+        all_fifths.append(steps_names_db[0])
     else:
-        last_step = find_step(all_fifths[-1][-1])
-        next_step = (last_step + 7) % 12  # express one fifth up somehow
+        previous_step = find_step(all_fifths[-1].get("unsigned") or all_fifths[-1].get("#") or all_fifths[-1]("b"))
+        next_step = (previous_step + 7) % 12
         all_fifths.append(steps_names_db[next_step])
-
-print(all_fifths)
-        
-circle_of_fifths = [(x[0] or x[2]) for x in all_fifths]
-circle_of_sharps = [x[2] for x in all_fifths[6:]]
+circle_of_fifths = [x.get("unsigned") or x.get("#") for x in all_fifths]
+circle_of_sharps = [x.get("#") for x in all_fifths[6:]]
 all_fourths = all_fifths[::-1]
-circle_of_fourths = [(x[0] or x[1]) for x in all_fourths]
-circle_of_flats = [x[1] for x in all_fourths[2:9]]
+circle_of_fourths = [x.get("unsigned") or x.get("b") for x in all_fourths]
+circle_of_flats = [x.get("b") for x in all_fourths[2:9]]
 
 ### SHARPENED / FLATTENED MAJOR SCALES START / NAME AND SHARP / FLAT MEMBERS
 sharp_major_scales = {}
@@ -63,7 +62,7 @@ flat_major_scales = {}
 for i in range(8):
     key_1 = circle_of_fifths[i+1]
     key_2 = circle_of_fourths[i+1]
-    key_2 = key_2 if key_2 != "B" else "Cb" #TODO: make notes into objs
+    key_2 = key_2 if key_2 != "B" else "Cb"
     values_1 = circle_of_sharps[:i]
     values_2 = circle_of_flats[:i]
     sharp_major_scales[key_1] = values_1
