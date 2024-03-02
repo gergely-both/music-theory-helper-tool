@@ -1,5 +1,7 @@
 import string
-from collections import defaultdict
+from collections import defaultdict, namedtuple
+
+Names = namedtuple("Names", "unsigned flat sharp")
 
 valid_names = string.ascii_uppercase[:7]
 names_order = valid_names[2:] + valid_names[:2]
@@ -8,23 +10,29 @@ major_steps = [0, 2, 4, 5, 7, 9, 11]
 major_mode_names = ["ionian", "dorian", "phrygian", "lydian", "mixolydian", "aeolian / minor", "locrian"]
 
 steps_names_db = defaultdict(dict)
+steps_notes_db = {}
 all_existing_notes = set()
 all_major_scales = {}
 all_major_scales_raw = {}
 all_major_modes = {}
 
 
-def find_step(note):
-    for x in steps_names_db:
-        if note in steps_names_db[x].values():
-            return x
+def find_step(name):
+    for step in steps_names_db:
+        if name in steps_names_db[step].values():
+            return step
+
+
+def find_note(name):
+    for note in all_existing_notes:
+        if name in note.names:
+            return note
 
 
 def extend_name(name):
-    for x in steps_names_db:
-        many_names = list(steps_names_db[x].values())
-        if name in many_names:
-            return many_names
+    for note in all_existing_notes:
+        if name in note.names:
+            return note.names
 
 
 def correct_name(current_step, sharps_or_flats=False):
@@ -40,6 +48,12 @@ def correct_name(current_step, sharps_or_flats=False):
         return list(all_names.values())
 
 
+class MusicalNote:
+    def __init__(self, step, names):
+        self.step = step
+        self.names = names
+
+
 # MAKING steps_names_db: 12 STEPS, ALL ENHARMONIC NAMES
 for x, y in zip(major_steps, names_order):
     steps_names_db[x]["unsigned"] = y
@@ -51,26 +65,32 @@ for symbol in valid_symbols:
         new_step = (orig_step + modifier) %12
         new_name = name + symbol
         steps_names_db[new_step][symbol] = new_name
-for x in steps_names_db:
-    notes = list(steps_names_db[x].values())
-    for note in notes:
-        all_existing_notes.add(note)
+
+for step in steps_names_db:
+    unsigned = steps_names_db[step].get("unsigned")
+    flat = steps_names_db[step].get("b")
+    sharp = steps_names_db[step].get("#")
+    steps_notes_db[step] = MusicalNote(step, Names(unsigned, flat, sharp))
+
+all_existing_notes = set(note for note in steps_notes_db.values())
 
 
 ### CIRCLE OF FIFTHS, FOURTHS, SHARPS AND FLATS
 all_fifths = []
 while not (all_fifths and all_fifths[0] == all_fifths[-1] and len(all_fifths) != 1):
     if not all_fifths:
-        all_fifths.append(steps_names_db[0])
+        all_fifths.append(steps_notes_db[0])
     else:
-        previous_step = find_step(all_fifths[-1].get("unsigned") or all_fifths[-1].get("#") or all_fifths[-1]("b"))
+        previous_step = all_fifths[-1].step
         next_step = (previous_step + 7) % 12
-        all_fifths.append(steps_names_db[next_step])
-circle_of_fifths = [x.get("unsigned") or x.get("#") for x in all_fifths]
-circle_of_sharps = [x.get("#") for x in all_fifths[6:]]
+        for note in all_existing_notes:
+            if note.step == next_step:
+                all_fifths.append(note)
+circle_of_fifths = [note.names.unsigned or note.names.sharp for note in all_fifths]
+circle_of_sharps = [note.names.sharp for note in all_fifths[6:]]
 all_fourths = all_fifths[::-1]
-circle_of_fourths = [x.get("unsigned") or x.get("b") for x in all_fourths]
-circle_of_flats = [x.get("b") for x in all_fourths[2:9]]
+circle_of_fourths = [note.names.unsigned or note.names.flat for note in all_fourths]
+circle_of_flats = [note.names.flat for note in all_fourths[2:9]]
 
 
 ### SHARPENED / FLATTENED MAJOR SCALES START / NAME AND SHARP / FLAT MEMBERS
@@ -85,14 +105,14 @@ for i in range(7):
     sharp_major_scales[sharp_scale_name] = sharp_notes
     flat_major_scales[flat_scale_name] = flat_notes
 
-
+# make OOP modification
 ### ALL KEY NAMES AND ALL THEIR MEMBERS: C MAJOR + FIFTHS/SHARPS + FOURTHS/FLATS
-all_major_scales[names_order[0]] = [x for x in names_order]
-all_major_scales_raw[names_order[0]] = []
-raw_scale_notes = [extend_name(x) for x in names_order]
-for notes in raw_scale_notes:
-    for note in notes:
-        all_major_scales_raw[names_order[0]].append(note)
+all_major_scales[names_order[0]] = [find_note(name) for name in names_order]
+# all_major_scales_raw[names_order[0]] = []
+# raw_scale_notes = [extend_name(x) for x in names_order]
+# for notes in raw_scale_notes:
+#     for note in notes:
+#         all_major_scales_raw[names_order[0]].append(note)
 
 for x, y in zip(sharp_major_scales, flat_major_scales):
     key_1 = x
