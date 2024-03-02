@@ -1,4 +1,5 @@
-# TODO: reduce input processing strictness, write unit tests (for borderline cases), make necessary OOP changes, 
+# TODO: make input user processing less strict, write unit tests for border cases, upgrade to OOP, 
+
 import string
 from music_theory_db import all_existing_notes, all_major_scales, all_major_scales_raw, all_major_modes, steps_names_db, extend_name
 
@@ -10,6 +11,7 @@ def display_results(text, notes):
 
 user_selection = []
 
+
 # ENTER FIRST MEMBER
 note_selected = False
 while not note_selected:
@@ -20,6 +22,7 @@ while not note_selected:
     else:
         print("Try something different.")
            
+
 # ENTER ADDITIONAL MEMBERS
 more_notes_selected = False
 while not more_notes_selected:
@@ -30,6 +33,7 @@ while not more_notes_selected:
         more_notes_selected = True
     else:
         print("Something's incorrect. Try again.")
+
 
 # MAJOR SCALE AND MODE SEARCH SYSTEM
 user_selection_temp = []
@@ -42,6 +46,7 @@ for scale_name in all_major_scales_raw:
     scale_notes = all_major_scales[scale_name]
     if (set(user_selection)).issubset(set(scale_notes_raw)):
         display_results(f"{scale_name} major key:", scale_notes)
+
         for mode_name in all_major_modes:
             mode_notes = all_major_modes[mode_name]
             if (set(scale_notes)) == (set(mode_notes)):
