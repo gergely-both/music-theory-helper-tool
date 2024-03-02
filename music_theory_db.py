@@ -1,8 +1,7 @@
-# key or scale (terminology), fix modes
 import string
 from collections import defaultdict
 
-valid_names = string.ascii_lowercase[:7]
+valid_names = string.ascii_uppercase[:7]
 names_order = valid_names[2:] + valid_names[:2]
 valid_symbols = {"b": -1, "#": +1}
 major_steps = [0, 2, 4, 5, 7, 9, 11]
@@ -24,7 +23,6 @@ def extend_name(name):
         if name in many_names:
             return many_names
 
-# TODO: make return str not set
 def correct_name(current_step, sharps_or_flats=False):
     all_names = steps_names_db[current_step]
     if sharps_or_flats:
@@ -116,7 +114,7 @@ for x, y in zip(sharp_major_scales, flat_major_scales):
         all_major_scales[key_2] = values_2
 
 
-### ALL MAJOR MODES GEN
+### ALL MAJOR MODES GEN: skipping ionian with 1 in range: equals basic major scale
 all_major_modes = {}
 for i in range(1, len(major_mode_names)):
     for name in all_major_scales:

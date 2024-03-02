@@ -1,11 +1,11 @@
-# TODO: edit view: note letter uppercase, fix modes, fix input pruning strictness, 
+# TODO: reduce input processing strictness, write unit tests (for borderline cases), make necessary OOP changes, 
 import string
 from music_theory_db import all_existing_notes, all_major_scales, all_major_scales_raw, all_major_modes, steps_names_db, extend_name
 
+
 def display_results(text, notes):
-    new_text = text.title()
-    scale = ", ".join([note.capitalize() for note in notes])
-    print(new_text, scale)
+    scale = ", ".join(notes)
+    print(text, scale)
 
 
 user_selection = []
@@ -13,7 +13,7 @@ user_selection = []
 # ENTER FIRST MEMBER
 note_selected = False
 while not note_selected:
-    response = input("Enter starting note: ").casefold()
+    response = input("Enter starting note: ").title()
     if response and response in all_existing_notes:
         user_selection.append(response)
         note_selected = True
@@ -23,7 +23,7 @@ while not note_selected:
 # ENTER ADDITIONAL MEMBERS
 more_notes_selected = False
 while not more_notes_selected:
-    response_2 = input("enter additional notes you know play well along: ").casefold()
+    response_2 = input("Enter additional notes you know play well alongside (comma-separated): ").title()
     response_2 = set(x.strip() for x in response_2.split(","))
     if response_2.issubset(all_existing_notes):
         user_selection.extend(response_2)
@@ -45,6 +45,6 @@ for scale_name in all_major_scales_raw:
         for mode_name in all_major_modes:
             mode_notes = all_major_modes[mode_name]
             if (set(scale_notes)) == (set(mode_notes)):
-                if any(name == mode_notes[0]for name in user_selection[0]):
+                if any(name == mode_notes[0]for name in extend_name(user_selection[0])):
                     display_results(f"{mode_name} mode:", mode_notes)
 
