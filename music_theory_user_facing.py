@@ -2,6 +2,11 @@
 import string
 from music_theory_db import all_existing_notes, all_major_scales, all_major_scales_raw, all_major_modes, steps_names_db, extend_name
 
+def display_results(text, notes):
+    new_text = text.title()
+    scale = ", ".join([note.capitalize() for note in notes])
+    print(new_text, scale)
+
 
 user_selection = []
 
@@ -33,14 +38,13 @@ for x in user_selection:
 user_selection = user_selection_temp
 
 for scale_name in all_major_scales_raw:
-    scale_notes = all_major_scales_raw[scale_name]
-    if (set(user_selection)).issubset(set(scale_notes)):
-        print(f"{scale_name} Major scale: {scale_notes}") # make into view fn
+    scale_notes_raw = all_major_scales_raw[scale_name]
+    scale_notes = all_major_scales[scale_name]
+    if (set(user_selection)).issubset(set(scale_notes_raw)):
+        display_results(f"{scale_name} major key:", scale_notes)
         for mode_name in all_major_modes:
             mode_notes = all_major_modes[mode_name]
-            # TODO: fix, mode notes is sets of one
-            print(scale_notes, mode_notes)
-            # if (set(scale_notes)) == (set(mode_notes)):
-            #     if any(name == mode_notes[0]for name in user_selection[0]):
-            #         print(f"{mode_name} mode: {mode_notes}")
+            if (set(scale_notes)) == (set(mode_notes)):
+                if any(name == mode_notes[0]for name in user_selection[0]):
+                    display_results(f"{mode_name} mode:", mode_notes)
 

@@ -24,12 +24,17 @@ def extend_name(name):
         if name in many_names:
             return many_names
 
-
+# TODO: make return str not set
 def correct_name(current_step, sharps_or_flats=False):
     all_names = steps_names_db[current_step]
     if sharps_or_flats:
-        return set(all_names.values()) & set(sharps_or_flats) or all_names["unsigned"]
-    else:
+        corrected_nameset = set(all_names.values()) & set(sharps_or_flats)
+        if corrected_nameset:
+            for corrected_name in corrected_nameset:
+                return corrected_name
+        else:
+            return all_names["unsigned"]
+    elif not sharps_or_flats:
         return list(all_names.values())
 
 
@@ -78,15 +83,13 @@ for i in range(7):
     flat_major_scales[flat_scale_name] = flat_notes
 
 
-### ALL SCALE NAMES AND ALL THEIR MEMBERS: C MAJOR, SHARPS, FLATS
+### ALL SCALE NAMES AND ALL THEIR MEMBERS: C MAJOR, WITH SHARPS, WITH FLATS
 all_major_scales[names_order[0]] = [x for x in names_order]
 all_major_scales_raw[names_order[0]] = []
 raw_scale_notes = [extend_name(x) for x in names_order]
 for notes in raw_scale_notes:
     for note in notes:
         all_major_scales_raw[names_order[0]].append(note)
-
-    
 for x, y in zip(sharp_major_scales, flat_major_scales):
     key_1 = x
     key_2 = y
@@ -115,11 +118,10 @@ for x, y in zip(sharp_major_scales, flat_major_scales):
 
 ### ALL MAJOR MODES GEN
 all_major_modes = {}
-for i in range(len(major_mode_names)):
+for i in range(1, len(major_mode_names)):
     for name in all_major_scales:
         scale = all_major_scales[name]
         new_scale = scale[i:] + scale[:i]
-        name = name + " " + major_mode_names[i]
+        name = new_scale[0] + " " + major_mode_names[i]
         all_major_modes[name] = new_scale
-
 
