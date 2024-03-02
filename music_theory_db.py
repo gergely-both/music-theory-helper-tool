@@ -1,4 +1,4 @@
-# key or scale (terminology), 
+# key or scale (terminology), fix modes
 import string
 from collections import defaultdict
 
@@ -115,8 +115,11 @@ for x, y in zip(sharp_major_scales, flat_major_scales):
 
 ### ALL MAJOR MODES GEN
 all_major_modes = {}
-for n in range(len(major_mode_names)):
-    for z in all_major_scales:
-        scale = all_major_scales[z]
-        new_scale = scale[n:] + scale[:n]
-        name = z + major_mode_names[n]
+for i in range(len(major_mode_names)):
+    for name in all_major_scales:
+        scale = all_major_scales[name]
+        new_scale = scale[i:] + scale[:i]
+        name = name + " " + major_mode_names[i]
+        all_major_modes[name] = new_scale
+
+

@@ -26,7 +26,6 @@ while not more_notes_selected:
     else:
         print("Something's incorrect. Try again.")
 
-
 # MAJOR SCALE AND MODE SEARCH SYSTEM
 user_selection_temp = []
 for x in user_selection:
@@ -39,7 +38,9 @@ for scale_name in all_major_scales_raw:
         print(f"{scale_name} Major scale: {scale_notes}") # make into view fn
         for mode_name in all_major_modes:
             mode_notes = all_major_modes[mode_name]
-            if set(scale_notes) == set(mode_notes):
-                if any(name == mode_notes[0]for name in user_selection[0]):
-                    print(f"{mode_name} mode: {mode_notes}")
+            # TODO: fix, mode notes is sets of one
+            print(scale_notes, mode_notes)
+            # if (set(scale_notes)) == (set(mode_notes)):
+            #     if any(name == mode_notes[0]for name in user_selection[0]):
+            #         print(f"{mode_name} mode: {mode_notes}")
 
