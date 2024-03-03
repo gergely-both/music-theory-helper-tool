@@ -1,7 +1,7 @@
 # TODO: make input user processing less strict, write unit tests for border cases, upgrade to OOP, 
 
 import string
-from music_theory_db import all_existing_notes, all_major_scales, all_major_scales_raw, all_major_modes, steps_names_db, extend_name
+from music_theory_db import all_existing_notes, all_major_scales, all_major_scales_mod, all_major_modes, steps_names_db, steps_notes_db, extend_name
 
 
 def display_results(text, notes):
@@ -16,7 +16,7 @@ user_selection = []
 note_selected = False
 while not note_selected:
     response = input("Enter starting note: ").title()
-    if response and response in all_existing_notes:
+    if response and find_note(response)
         user_selection.append(response)
         note_selected = True
     else:
