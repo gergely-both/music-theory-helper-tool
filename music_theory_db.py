@@ -97,7 +97,8 @@ sharp_keys_sharps = {}
 flat_keys_flats = {}
 for i in range(7):
     sharp_scale_name = circle_of_fifths[i+1]
-    flat_scale_name = flat_scale_name := circle_of_fourths[i+1] if flat_scale_name != "B" else "Cb"
+    flat_scale_name = circle_of_fourths[i+1] 
+    flat_scale_name = flat_scale_name if flat_scale_name != "B" else "Cb" 
     sharp_notes = circle_of_sharps[:i+1]
     flat_notes = circle_of_flats[:i+1]
     sharp_keys_sharps[sharp_scale_name] = sharp_notes
@@ -106,6 +107,9 @@ for i in range(7):
 
 ### ALL KEY NAMES AND ALL THEIR MEMBERS GEN, with objects + with correct naming system
 all_major_scales[names_order[0]] = [find_note(name) for name in names_order]
+for key, notes in all_major_scales.items():
+   all_major_scales_mod[key] = [note.names.unsigned for note in notes]
+
 for signed_keys_signs in sharp_keys_sharps, flat_keys_flats:
     for signed_key in signed_keys_signs:
         signed_key_notes = []
