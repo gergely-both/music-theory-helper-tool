@@ -1,5 +1,7 @@
-* TODO editable named enharmony grouping if possible
+* DONE editable named enharmony grouping if possible
+* DONE OOP remodelling
 * TODO guitar tab view
 * TODO piano keys view
-* TODO chords and chord progressions
-* TODO OOP remodelling
+* TODO make tkinter GUI
+* TODO chords / chord progressions
+* TODO unit test border cases

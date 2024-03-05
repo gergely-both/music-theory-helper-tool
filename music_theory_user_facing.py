@@ -1,15 +1,17 @@
-# TODO: make input user processing less strict, write unit tests for border cases, make output more organized, 
-
 import string
 from music_theory_db import all_major_scales, all_major_scales_mod, all_major_modes, find_note
 
-
-def display_results(text, notes):
-    scale = ", ".join(notes)
-    print(text, scale)
-
-
+found_scales = []
+found_modes = []
 user_selection = []
+
+
+def display_results():
+    all_found = found_scales + found_modes
+    if all_found:
+        for key_text, notes in all_found:
+            scale = ", ".join(notes)
+            print(key_text, scale)
 
 
 # ENTER FIRST MEMBER
@@ -41,9 +43,13 @@ while not more_notes_selected:
 for key_name, scale_notes in all_major_scales.items():
     scale_notes_mod = all_major_scales_mod[key_name]
     if set(user_selection).issubset(set(scale_notes)):
-        display_results(f"{key_name} major key:", scale_notes_mod)
+        found_scale = (f"{key_name} major key:", scale_notes_mod)
+        found_scales.append(found_scale)
         for mode_name, mode_notes in all_major_modes.items():
             if set(scale_notes_mod) == set(mode_notes):
                 if any(name == mode_notes[0] for name in user_selection[0].names):
-                    display_results(f"{mode_name} mode:", mode_notes)
+                    found_mode = (f"{mode_name} mode:", mode_notes)
+                    found_modes.append(found_mode)
+
+display_results()
 
