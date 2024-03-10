@@ -1,3 +1,4 @@
 * TODO make tkinter GUI (guitar tab, piano keys view)
-* TODO chords, chord progressions
+* TODO chords, chord progressions, inversions
 * TODO do unit test border cases
+* TODO mustheo use cycle, chain

@@ -1,5 +1,7 @@
+import tkinter as tk
 import string
 from music_theory_db import all_major_scales, all_major_scales_mod, all_major_modes, find_note
+
 
 found_scales = []
 found_modes = []
