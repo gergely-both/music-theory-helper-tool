@@ -1,10 +1,36 @@
 import tkinter as tk
-from music_theory_db import valid_names, valid_symbols, find_note
+from music_theory_db import valid_names, valid_symbols, find_note, all_major_scales, all_major_scales_mod, all_major_modes
+
 
 button_properties = {
 "width": 3,
 "relief": "raised",
 }
+
+
+def display_results():
+    all_found = found_scales + found_modes
+    if all_found:
+        for key_text, notes in all_found:
+            scale = ", ".join(notes)
+            print(key_text, scale)
+
+
+def find_all(notes_selection):
+	found_scales = []
+	found_modes = []
+    for key_name, scale_notes in all_major_scales.items():
+        scale_notes_mod = all_major_scales_mod[key_name]
+        if set(notes_selection).issubset(set(scale_notes)):
+            found_scale = (f"{key_name} major key:", scale_notes_mod)
+            found_scales.append(found_scale)
+            for mode_name, mode_notes in all_major_modes.items():
+                if set(scale_notes_mod) == set(mode_notes):
+                    if any(name == mode_notes[0] for name in notes_selection[0].names):
+                        found_mode = (f"{mode_name} mode:", mode_notes)
+                        found_modes.append(found_mode)
+    display_results()
+                        
 
 class Window:
     def __init__(self, master):
@@ -12,10 +38,12 @@ class Window:
         self.master.title("Music Theory Helper Tool")
         # self.master.geometry("400x400")
         # self.master.resizable(0, 0)
+
         self.label_guide = tk.Label(master, text="Enter the starting / base note:", height=5)
         self.label_guide.grid(row=0, columnspan=7)
         self.label = tk.Label(master, height=5)
         self.label.grid(row=1, column=0, columnspan=7)
+
         self.button_c = tk.Button(master, text="C", command=lambda: self.button_input("C"), **button_properties)
         self.button_c.grid(row=2, column=0)
         self.button_d = tk.Button(master, text="D", command=lambda: self.button_input("D"), **button_properties)
@@ -30,10 +58,12 @@ class Window:
         self.button_a.grid(row=2, column=5)
         self.button_b = tk.Button(master, text="B", command=lambda: self.button_input("B"), **button_properties)
         self.button_b.grid(row=2, column=6)
-        self.button_sharp = tk.Button(master, text="#", command=lambda: self.button_input("#"), **button_properties)
-        self.button_sharp.grid(row=3, column=4, columnspan=2)
+
         self.button_flat = tk.Button(master, text="b", command=lambda: self.button_input("b"), **button_properties)
         self.button_flat.grid(row=3, column=1, columnspan=2)
+        self.button_sharp = tk.Button(master, text="#", command=lambda: self.button_input("#"), **button_properties)
+        self.button_sharp.grid(row=3, column=4, columnspan=2)
+
         self.button_ok = tk.Button(master, text="OK", state="disabled", command=lambda: self.button_input("OK"), **button_properties)
         self.button_ok.grid(row=4, column=0, columnspan=7)
         self.button_next = tk.Button(master, text="next", state="disabled", command=lambda: self.button_input("NEXT"), **button_properties)
@@ -63,8 +93,9 @@ class Window:
                     self.queue.append(new_note)
                 self.inputs.clear()
         elif value == "NEXT":
-            pass
-
+            all_notes = [find_note(element) for element in self.queue]
+            all_scales, all_modes = find_all(all_notes)
+            self.label.config(text=all_scales)
 
 
         if self.inputs:
