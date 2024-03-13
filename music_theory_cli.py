@@ -2,6 +2,8 @@ import string
 from music_theory_db import all_scales_raw, all_scales_corrected, all_modes, find_note
 
 
+found_scales = []
+found_modes = []
 user_selection = []
 
 
@@ -39,19 +41,16 @@ while not more_notes_selected:
 
 
 # MAJOR SCALE AND MODE SEARCH SYSTEM
-def find_all(notes):
-    found_scales = []
-    found_modes = []
-    for key_name, scale_notes in all_scales_raw.items():
-        scale_notes_mod = all_scales_corrected[key_name]
-        if set(user_selection).issubset(set(scale_notes)):
-            found_scale = (f"{key_name} major key:", scale_notes_mod)
-            found_scales.append(found_scale)
-            for mode_name, mode_notes in all_modes.items():
-                if set(scale_notes_mod) == set(mode_notes):
-                    if any(name == mode_notes[0] for name in user_selection[0].names):
-                        found_mode = (f"{mode_name} mode:", mode_notes)
-                        found_modes.append(found_mode)
-    return found_scales, found_modes
+for key_name, scale_notes in all_scales_raw.items():
+    scale_notes_mod = all_scales_corrected[key_name]
+    if set(user_selection).issubset(set(scale_notes)):
+        found_scale = (f"{key_name} major key:", scale_notes_mod)
+        found_scales.append(found_scale)
+        for mode_name, mode_notes in all_modes.items():
+            if set(scale_notes_mod) == set(mode_notes):
+                if any(name == mode_notes[0] for name in user_selection[0].names):
+                    found_mode = (f"{mode_name} mode:", mode_notes)
+                    found_modes.append(found_mode)
+display_results()
 
 
