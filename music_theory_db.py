@@ -12,9 +12,9 @@ major_mode_names = ["ionian", "dorian", "phrygian", "lydian", "mixolydian", "aeo
 steps_names_db = defaultdict(dict)
 steps_notes_db = {}
 all_existing_notes = set()
-all_major_scales = {}
-all_major_scales_mod = {}
-all_major_modes = {}
+all_scales_raw = {}
+all_scales_corrected = {}
+all_modes = {}
 
 
 def find_step(name):
@@ -106,9 +106,9 @@ for i in range(7):
 
 
 ### ALL KEY NAMES AND ALL THEIR MEMBERS GEN, with objects + with correct naming system
-all_major_scales[names_order[0]] = [find_note(name) for name in names_order]
-for key, notes in all_major_scales.items():
-   all_major_scales_mod[key] = [note.names.unsigned for note in notes]
+all_scales_raw[names_order[0]] = [find_note(name) for name in names_order]
+for key, notes in all_scales_raw.items():
+   all_scales_corrected[key] = [note.names.unsigned for note in notes]
 
 for signed_keys_signs in sharp_keys_sharps, flat_keys_flats:
     for signed_key in signed_keys_signs:
@@ -121,14 +121,15 @@ for signed_keys_signs in sharp_keys_sharps, flat_keys_flats:
             signed_corrected_name = correct_name(signed_key_note, signed_keys_signs[signed_key])
             signed_key_notes.append(signed_key_note)
             signed_key_corrected_names.append(signed_corrected_name)
-        all_major_scales[signed_key] = signed_key_notes
-        all_major_scales_mod[signed_key] = signed_key_corrected_names
+        all_scales_raw[signed_key] = signed_key_notes
+        all_scales_corrected[signed_key] = signed_key_corrected_names
 
 
 ### ALL MAJOR MODES GEN: skipping ionian with 1 in range (reason: equals basic major scale)
 for i in range(1, len(major_mode_names)):
-    for key_name, scale in all_major_scales_mod.items():
+    for key_name, scale in all_scales_corrected.items():
         new_scale = scale[i:] + scale[:i]
         key_name = new_scale[0] + " " + major_mode_names[i]
-        all_major_modes[key_name] = new_scale
+        all_modes[key_name] = new_scale
+
 

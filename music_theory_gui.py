@@ -1,5 +1,5 @@
 import tkinter as tk
-from music_theory_db import valid_names, valid_symbols, find_note, all_major_scales, all_major_scales_mod, all_major_modes
+from music_theory_db import find_note, valid_names, valid_symbols, all_scales_raw, all_scales_corrected, all_modes
 
 
 button_properties = {
@@ -117,12 +117,12 @@ class Window:
 
 
     def find_all(self, notes_selection):
-        for key_name, scale_notes in all_major_scales.items():
-            scale_notes_mod = all_major_scales_mod[key_name]
+        for key_name, scale_notes in all_scales_raw.items():
+            scale_notes_mod = all_scales_corrected[key_name]
             if set(notes_selection).issubset(set(scale_notes)):
                 found_scale = (f"{key_name} major key: ", scale_notes_mod)
                 self.found_scales.append(found_scale)
-                for mode_name, mode_notes in all_major_modes.items():
+                for mode_name, mode_notes in all_modes.items():
                     if set(scale_notes_mod) == set(mode_notes):
                         if any(name == mode_notes[0] for name in notes_selection[0].names):
                             found_mode = (f"{mode_name} mode: ", mode_notes)
