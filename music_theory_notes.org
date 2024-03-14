@@ -1,5 +1,5 @@
-* TODO GUI window size flexibility, centered placement, resizability decide, 
-* TODO make delete current user selection button
-* TODO guitar tab, piano keys drawn/overlaid GUI view
+* TODO GUI window size flexibility, centered placement
+* TODO delete + backspace user selection button make
 * TODO chords, chord progressions, chord inversions
-* TODO do border cases unit tests
+* TODO guitar tab, piano keys drawn/overlaid GUI view
+* TODO make border cases unit tests

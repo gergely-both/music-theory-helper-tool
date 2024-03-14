@@ -47,8 +47,8 @@ class Window:
 
         self.inputs = []
         self.queue = []
-        self.found_scales = []
-        self.found_modes = []
+        self.scales_found = []
+        self.modes_found = []
 
 
     def button_input(self, value):
@@ -74,11 +74,11 @@ class Window:
             notes_selection = [find_note(note_name) for note_name in self.queue]
             self.find_all(notes_selection)
        
-        if self.found_scales and self.found_modes:
+        if self.scales_found and self.modes_found:
             self.display_results()
             self.queue.clear()
-            self.found_scales.clear()
-            self.found_modes.clear()
+            self.scales_found.clear()
+            self.modes_found.clear()
         else:
             self.update_view()
 
@@ -107,7 +107,7 @@ class Window:
 
 
     def display_results(self):
-        all_found = self.found_scales + self.found_modes
+        all_found = self.scales_found + self.modes_found
         if all_found:
             to_output = [key + ", ".join(notes) for key, notes in all_found]
             # print("\n".join(to_output))
@@ -119,16 +119,17 @@ class Window:
         for scale_key, scale_notes_raw in all_scales_raw.items():
             scale_notes_corrected = all_scales_corrected[scale_key]
             if set(notes_selection).issubset(set(scale_notes_raw)):
-                scale_found = (f"{scale_key} major key: ", scale_notes_corrected)
-                self.found_scales.append(scale_found)
+                found_scale = (f"{scale_key} major key: ", scale_notes_corrected)
+                self.scales_found.append(found_scale)
                 for mode_name, mode_notes in all_modes.items():
                     if set(scale_notes_corrected) == set(mode_notes):
                         if any(name == mode_notes[0] for name in notes_selection[0].names):
-                            mode_found = (f"{mode_name} mode: ", mode_notes)
-                            self.found_modes.append(mode_found)
+                            found_mode = (f"{mode_name} mode: ", mode_notes)
+                            self.modes_found.append(found_mode)
 
 
 root = tk.Tk()
 app = Window(root)
 root.mainloop()
+
 
