@@ -14,7 +14,10 @@ class Window:
         self.master.title("Music Theory Helper Tool")
         # self.master.geometry("400x400")
         # self.master.resizable(0, 0)
-
+        # self.screenwidth = master.winfo_screenwidth()
+        # self.screenheight = master.winfo_screenheight()
+        # self.master.geometry(f"{int(self.screenwidth/4)}x{int(self.screenheight/2)}")
+        # master.eval("tk::PlaceWindow . center")
         self.guiding_label = tk.Label(master, text="Enter the starting / base note:", height=5)
         self.guiding_label.grid(row=0, columnspan=7)
         self.interaction_label = tk.Label(master, height=25)
@@ -44,6 +47,10 @@ class Window:
         self.button_ok.grid(row=4, column=0, columnspan=7)
         self.button_next = tk.Button(master, text="next", state="disabled", command=lambda: self.button_input("NEXT"), **button_properties)
         self.button_next.grid(row=5, column=0, columnspan=7)
+        self.button_del = tk.Button(master, text="del", state="disabled", command=lambda: self.button_input("del"), **button_properties)
+        self.button_del.grid(row=6, column=0, columnspan=3)
+        self.button_clear = tk.Button(master, text="clear", state="disabled", command=lambda: self.button_input("clear"), **button_properties)
+        self.button_clear.grid(row=6, column=4, columnspan=3)
 
         self.inputs = []
         self.queue = []
@@ -73,7 +80,11 @@ class Window:
         elif value == "NEXT":
             notes_selection = [find_note(note_name) for note_name in self.queue]
             self.find_all(notes_selection)
-       
+        elif value == "del" and self.queue:
+            del self.queue[-1]
+        elif value == "clear" and self.inputs:
+            self.inputs.clear()
+
         if self.scales_found and self.modes_found:
             self.display_results()
             self.queue.clear()
@@ -84,12 +95,20 @@ class Window:
 
         if self.inputs:
             self.button_ok.config(state="normal")
+            self.button_clear.config(state="normal")
         else:
             self.button_ok.config(state="disabled")
-        if len(self.queue) >= 2 and not self.inputs:
-            self.button_next.config(state="normal")
+            self.button_clear.config(state="disabled")
+
+        if self.queue:
+            if len(self.queue) >= 2 and not self.inputs:
+                self.button_next.config(state="normal")
+            else:
+                self.button_next.config(state="disabled")
+                self.button_del.config(state="normal")
         else:
             self.button_next.config(state="disabled")
+            self.button_del.config(state="disabled")
  
 
     def update_view(self):
@@ -98,10 +117,14 @@ class Window:
         if self.queue:
             self.guiding_label.config(text="Enter additional notes that belong together:")
             to_show.extend(self.queue)
+        else:
+            self.guiding_label.config(text="Enter the starting / base note:")
+
         if self.inputs:
             user_selection = f'[{"".join(self.inputs)}]'
         else:
             user_selection = "[ ]"
+
         to_show.append(user_selection)
         self.interaction_label.config(text=" ".join(to_show))
 
