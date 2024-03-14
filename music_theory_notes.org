@@ -1,4 +1,5 @@
-* TODO make tkinter GUI (guitar tab, piano keys view)
-* TODO chords, chord progressions, inversions
-* TODO do unit test border cases
-* TODO mustheo use cycle, chain
+* TODO GUI window size flexibility, centered placement, resizability decide, 
+* TODO make delete current user selection button
+* TODO guitar tab, piano keys drawn/overlaid GUI view
+* TODO chords, chord progressions, chord inversions
+* TODO do border cases unit tests

@@ -15,10 +15,10 @@ class Window:
         # self.master.geometry("400x400")
         # self.master.resizable(0, 0)
 
-        self.label_guide = tk.Label(master, text="Enter the starting / base note:", height=5)
-        self.label_guide.grid(row=0, columnspan=7)
-        self.label = tk.Label(master, height=25)
-        self.label.grid(row=1, column=0, columnspan=7)
+        self.guiding_label = tk.Label(master, text="Enter the starting / base note:", height=5)
+        self.guiding_label.grid(row=0, columnspan=7)
+        self.interaction_label = tk.Label(master, height=25)
+        self.interaction_label.grid(row=1, column=0, columnspan=7)
 
         self.button_c = tk.Button(master, text="C", command=lambda: self.button_input("C"), **button_properties)
         self.button_c.grid(row=2, column=0)
@@ -45,14 +45,12 @@ class Window:
         self.button_next = tk.Button(master, text="next", state="disabled", command=lambda: self.button_input("NEXT"), **button_properties)
         self.button_next.grid(row=5, column=0, columnspan=7)
 
-
         self.inputs = []
         self.queue = []
         self.found_scales = []
         self.found_modes = []
 
 
-    # TODO: fix this sys
     def button_input(self, value):
         if value in valid_names:
             self.inputs.clear()
@@ -68,69 +66,69 @@ class Window:
                         del self.inputs[1]
         elif value == "OK":
             if self.inputs:
-                new_note = "".join(self.inputs)
-                if new_note not in self.queue:
-                    self.queue.append(new_note)
+                note_name = "".join(self.inputs)
+                if note_name not in self.queue:
+                    self.queue.append(note_name)
                 self.inputs.clear()
         elif value == "NEXT":
-            all_notes = [find_note(element) for element in self.queue]
-            self.find_all(all_notes)
-            self.queue.clear()
-
-        if self.inputs:
-            self.button_ok.config(state="normal")
-        elif not self.inputs:
-            self.button_ok.config(state="disabled")
-        if len(self.queue) >= 2:
-            self.button_next.config(state="normal")
-        elif len(self.queue) < 2:
-            self.button_next.config(state="disabled")
-        
+            notes_selection = [find_note(note_name) for note_name in self.queue]
+            self.find_all(notes_selection)
+       
         if self.found_scales and self.found_modes:
             self.display_results()
+            self.queue.clear()
             self.found_scales.clear()
             self.found_modes.clear()
         else:
             self.update_view()
 
+        if self.inputs:
+            self.button_ok.config(state="normal")
+        else:
+            self.button_ok.config(state="disabled")
+        if len(self.queue) >= 2 and not self.inputs:
+            self.button_next.config(state="normal")
+        else:
+            self.button_next.config(state="disabled")
+ 
 
     def update_view(self):
         to_show = []
+        user_selection = ""
         if self.queue:
-            self.label_guide.config(text="Enter additional notes that belong together:")
+            self.guiding_label.config(text="Enter additional notes that belong together:")
             to_show.extend(self.queue)
         if self.inputs:
-            user_input = f'[{"".join(self.inputs)}]'
-        elif not self.inputs:
-            user_input = "[ ]"
-        to_show.append("".join(user_input))
-        self.label.config(text=" ".join(to_show))
+            user_selection = f'[{"".join(self.inputs)}]'
+        else:
+            user_selection = "[ ]"
+        to_show.append(user_selection)
+        self.interaction_label.config(text=" ".join(to_show))
 
 
     def display_results(self):
         all_found = self.found_scales + self.found_modes
         if all_found:
             to_output = [key + ", ".join(notes) for key, notes in all_found]
-            print("\n".join(to_output))
-            self.label.config(text="\n".join(to_output))
-            self.label_guide.config(text="The found key scales and modes are:")
+            # print("\n".join(to_output))
+            self.interaction_label.config(text="\n".join(to_output))
+            self.guiding_label.config(text=f'The key scales and modes for {"|".join(self.queue)} are:')
 
 
     def find_all(self, notes_selection):
-        for key_name, scale_notes in all_scales_raw.items():
-            scale_notes_mod = all_scales_corrected[key_name]
-            if set(notes_selection).issubset(set(scale_notes)):
-                found_scale = (f"{key_name} major key: ", scale_notes_mod)
-                self.found_scales.append(found_scale)
+        for scale_key, scale_notes_raw in all_scales_raw.items():
+            scale_notes_corrected = all_scales_corrected[scale_key]
+            if set(notes_selection).issubset(set(scale_notes_raw)):
+                scale_found = (f"{scale_key} major key: ", scale_notes_corrected)
+                self.found_scales.append(scale_found)
                 for mode_name, mode_notes in all_modes.items():
-                    if set(scale_notes_mod) == set(mode_notes):
+                    if set(scale_notes_corrected) == set(mode_notes):
                         if any(name == mode_notes[0] for name in notes_selection[0].names):
-                            found_mode = (f"{mode_name} mode: ", mode_notes)
-                            self.found_modes.append(found_mode)
+                            mode_found = (f"{mode_name} mode: ", mode_notes)
+                            self.found_modes.append(mode_found)
 
 
 root = tk.Tk()
 app = Window(root)
 root.mainloop()
-
 
