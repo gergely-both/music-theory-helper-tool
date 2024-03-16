@@ -51,6 +51,8 @@ class Window:
         self.button_del.grid(row=6, column=0, columnspan=3)
         self.button_clear = tk.Button(master, text="clear", state="disabled", command=lambda: self.button_input("clear"), **button_properties)
         self.button_clear.grid(row=6, column=4, columnspan=3)
+        self.button_restart = tk.Button(master, text="restart", state="normal", command=lambda: self.button_input("restart"), **button_properties)
+        self.button_restart.grid(row=7, column=0, columnspan=7)
 
         self.inputs = []
         self.queue = []
@@ -72,11 +74,10 @@ class Window:
                     elif value == self.inputs[1]:
                         del self.inputs[1]
         elif value == "OK":
-            if self.inputs:
-                note_name = "".join(self.inputs)
-                if note_name not in self.queue:
-                    self.queue.append(note_name)
-                self.inputs.clear()
+            note_name = "".join(self.inputs)
+            if note_name not in self.queue:
+                self.queue.append(note_name)
+            self.inputs.clear()
         elif value == "NEXT":
             notes_selection = [find_note(note_name) for note_name in self.queue]
             self.find_all(notes_selection)
@@ -84,6 +85,10 @@ class Window:
             del self.queue[-1]
         elif value == "clear" and self.inputs:
             self.inputs.clear()
+        elif value == "restart":
+            self.inputs.clear()
+            self.queue.clear()
+
 
         if self.scales_found and self.modes_found:
             self.display_results()
@@ -93,13 +98,13 @@ class Window:
         else:
             self.update_view()
 
+
         if self.inputs:
             self.button_ok.config(state="normal")
             self.button_clear.config(state="normal")
         else:
             self.button_ok.config(state="disabled")
             self.button_clear.config(state="disabled")
-
         if self.queue:
             if len(self.queue) >= 2 and not self.inputs:
                 self.button_next.config(state="normal")
