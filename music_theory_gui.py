@@ -95,7 +95,7 @@ class Window:
         self.buttons_flip()
 
 
-    def display_dispatch(self, value):
+    def display_dispatch(self, value: str) -> None:
         """dispatches to display fn to show query results xor interactions"""
         if value == "NEXT":
             self.display_results()
@@ -106,7 +106,7 @@ class Window:
             self.update_view()
 
 
-    def buttons_flip(self):
+    def buttons_flip(self) -> None:
         """changes button states by conditions"""
         if self.inputs:
             self.button_ok.config(state="normal")
@@ -125,7 +125,7 @@ class Window:
             self.button_del.config(state="disabled")
  
 
-    def update_view(self):
+    def update_view(self) -> None:
         """displays user interaction"""
         to_show = []
         user_selection = ""
@@ -144,7 +144,7 @@ class Window:
         self.interaction_label.config(text=" ".join(to_show))
 
 
-    def display_results(self):
+    def display_results(self) -> None:
         """displays query results"""
         all_found = self.scales_found + self.modes_found
         self.guiding_label.config(text=f'The key scales and modes for {"|".join(self.queue)} are:')
