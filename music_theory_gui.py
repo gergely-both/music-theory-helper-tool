@@ -54,7 +54,7 @@ class Window:
         self.button_clear.grid(row=6, column=4, columnspan=3)
         self.button_restart = tk.Button(master, text="restart", state="normal", command=lambda: self.button_input("restart"), **button_properties)
         self.button_restart.grid(row=7, column=0, columnspan=7)
-### INTERNAL VALUES (CHANGE TO ARGS PASSING INSTEAD?)
+
         self.inputs = []
         self.queue = []
         self.scales_found = []
@@ -98,12 +98,12 @@ class Window:
     def display_dispatch(self, value: str) -> None:
         """dispatches to display fn to show query results xor interactions"""
         if value == "NEXT":
-            self.display_results()
+            self.display_result()
             self.queue.clear()
             self.scales_found.clear()
             self.modes_found.clear()
         else:
-            self.update_view()
+            self.display_interaction()
 
 
     def buttons_flip(self) -> None:
@@ -125,7 +125,7 @@ class Window:
             self.button_del.config(state="disabled")
  
 
-    def update_view(self) -> None:
+    def display_interaction(self) -> None:
         """displays user interaction"""
         to_show = []
         user_selection = ""
@@ -144,7 +144,7 @@ class Window:
         self.interaction_label.config(text=" ".join(to_show))
 
 
-    def display_results(self) -> None:
+    def display_result(self) -> None:
         """displays query results"""
         all_found = self.scales_found + self.modes_found
         self.guiding_label.config(text=f'The key scales and modes for {"|".join(self.queue)} are:')
