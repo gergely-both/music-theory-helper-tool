@@ -1,5 +1,10 @@
-* TODO GUI window size flexibility, centered placement
-* DONE delete + backspace user selection button make
-* TODO chords, chord progressions, chord inversions
-* TODO guitar tab, piano keys drawn/overlaid GUI view
-* TODO make border cases unit tests
+* General
+** DONE if nothing found message out
+** TODO cli version better input tolerance
+** TODO try python switch syntax?
+
+* GUI
+** TODO make border cases unit tests
+** TODO GUI window size flex, centered
+** TODO guitar tab, piano keys drawn/overlaid GUI view
+** TODO chords: progressions, chord inversions

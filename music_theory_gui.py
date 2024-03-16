@@ -90,7 +90,7 @@ class Window:
             self.queue.clear()
 
 
-        if self.scales_found and self.modes_found:
+        if value == "NEXT":
             self.display_results()
             self.queue.clear()
             self.scales_found.clear()
@@ -136,11 +136,12 @@ class Window:
 
     def display_results(self):
         all_found = self.scales_found + self.modes_found
+        self.guiding_label.config(text=f'The key scales and modes for {"|".join(self.queue)} are:')
         if all_found:
             to_output = [key + ", ".join(notes) for key, notes in all_found]
-            # print("\n".join(to_output))
             self.interaction_label.config(text="\n".join(to_output))
-            self.guiding_label.config(text=f'The key scales and modes for {"|".join(self.queue)} are:')
+        else:
+            self.interaction_label.config(text="Nothing found...")
 
 
     def find_all(self, notes_selection):
