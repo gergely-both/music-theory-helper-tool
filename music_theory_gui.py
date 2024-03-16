@@ -1,5 +1,7 @@
 import tkinter as tk
-from music_theory_db import find_note, valid_names, valid_symbols, all_scales_raw, all_scales_corrected, all_modes
+from typing import List
+from music_theory_db import MusicalNote, find_note, valid_names, valid_symbols, all_scales_raw, all_scales_corrected, all_modes
+
 
 ### TKINTER BUTTON PARAMS
 button_properties = {
@@ -7,8 +9,9 @@ button_properties = {
 "relief": "raised",
 }
 
-### TKINTER WINDOW PARAMS
+
 class Window:
+    """tkinter window elements, attributes etc."""
     def __init__(self, master):
         self.master = master
         self.master.title("Music Theory Helper Tool")
@@ -57,8 +60,9 @@ class Window:
         self.scales_found = []
         self.modes_found = []
 
-### BUTTON PRESS DISPATCHER, MAIN CONTROLLER CYCLE
-    def button_input(self, value):
+
+    def button_input(self, value: str) -> None:
+        """button press dispatcher, main controller cycle"""
         if value in valid_names:
             self.inputs.clear()
             self.inputs.append(value)
@@ -87,7 +91,12 @@ class Window:
             self.inputs.clear()
             self.queue.clear()
 
-### DISPLAY SYSTEM DISPATCHER
+        self.display_dispatch(value)
+        self.buttons_flip()
+
+
+    def display_dispatch(self, value):
+        """dispatches to display fn to show query results xor interactions"""
         if value == "NEXT":
             self.display_results()
             self.queue.clear()
@@ -96,7 +105,9 @@ class Window:
         else:
             self.update_view()
 
-### CONDITIONAL BUTTON STATE CHANGES
+
+    def buttons_flip(self):
+        """changes button states by conditions"""
         if self.inputs:
             self.button_ok.config(state="normal")
             self.button_clear.config(state="normal")
@@ -113,8 +124,9 @@ class Window:
             self.button_next.config(state="disabled")
             self.button_del.config(state="disabled")
  
-### DISPLAY USER INTERACTION
+
     def update_view(self):
+        """displays user interaction"""
         to_show = []
         user_selection = ""
         if self.queue:
@@ -131,8 +143,9 @@ class Window:
         to_show.append(user_selection)
         self.interaction_label.config(text=" ".join(to_show))
 
-### DISPLAY QUERY RESULTS
+
     def display_results(self):
+        """displays query results"""
         all_found = self.scales_found + self.modes_found
         self.guiding_label.config(text=f'The key scales and modes for {"|".join(self.queue)} are:')
         if all_found:
@@ -141,8 +154,9 @@ class Window:
         else:
             self.interaction_label.config(text="Nothing found...")
 
-### FIND MAJOR SCALES AND MODES BASED ON OBJ REFS
-    def find_all(self, notes_selection):
+
+    def find_all(self, notes_selection: List[MusicalNote]) -> None:
+        """finds major scales and modes based on object references"""
         for scale_key, scale_notes_raw in all_scales_raw.items():
             scale_notes_corrected = all_scales_corrected[scale_key]
             if set(notes_selection).issubset(set(scale_notes_raw)):
@@ -154,9 +168,8 @@ class Window:
                             found_mode = (f"{mode_name} mode: ", mode_notes)
                             self.modes_found.append(found_mode)
 
-### GUI MAIN LOOP
+
 root = tk.Tk()
 app = Window(root)
 root.mainloop()
-
 
