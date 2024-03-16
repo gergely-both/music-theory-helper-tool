@@ -1,13 +1,13 @@
 import tkinter as tk
 from music_theory_db import find_note, valid_names, valid_symbols, all_scales_raw, all_scales_corrected, all_modes
 
-
+### TKINTER BUTTON PARAMS
 button_properties = {
 "width": 3,
 "relief": "raised",
 }
 
-
+### TKINTER WINDOW PARAMS
 class Window:
     def __init__(self, master):
         self.master = master
@@ -18,11 +18,11 @@ class Window:
         # self.screenheight = master.winfo_screenheight()
         # self.master.geometry(f"{int(self.screenwidth/4)}x{int(self.screenheight/2)}")
         # master.eval("tk::PlaceWindow . center")
+
         self.guiding_label = tk.Label(master, text="Enter the starting / base note:", height=5)
         self.guiding_label.grid(row=0, columnspan=7)
         self.interaction_label = tk.Label(master, height=25)
         self.interaction_label.grid(row=1, column=0, columnspan=7)
-
         self.button_c = tk.Button(master, text="C", command=lambda: self.button_input("C"), **button_properties)
         self.button_c.grid(row=2, column=0)
         self.button_d = tk.Button(master, text="D", command=lambda: self.button_input("D"), **button_properties)
@@ -37,12 +37,10 @@ class Window:
         self.button_a.grid(row=2, column=5)
         self.button_b = tk.Button(master, text="B", command=lambda: self.button_input("B"), **button_properties)
         self.button_b.grid(row=2, column=6)
-
         self.button_flat = tk.Button(master, text="b", command=lambda: self.button_input("b"), **button_properties)
         self.button_flat.grid(row=3, column=1, columnspan=2)
         self.button_sharp = tk.Button(master, text="#", command=lambda: self.button_input("#"), **button_properties)
         self.button_sharp.grid(row=3, column=4, columnspan=2)
-
         self.button_ok = tk.Button(master, text="OK", state="disabled", command=lambda: self.button_input("OK"), **button_properties)
         self.button_ok.grid(row=4, column=0, columnspan=7)
         self.button_next = tk.Button(master, text="next", state="disabled", command=lambda: self.button_input("NEXT"), **button_properties)
@@ -53,13 +51,13 @@ class Window:
         self.button_clear.grid(row=6, column=4, columnspan=3)
         self.button_restart = tk.Button(master, text="restart", state="normal", command=lambda: self.button_input("restart"), **button_properties)
         self.button_restart.grid(row=7, column=0, columnspan=7)
-
+### INTERNAL VALUES (CHANGE TO ARGS PASSING INSTEAD?)
         self.inputs = []
         self.queue = []
         self.scales_found = []
         self.modes_found = []
 
-
+### BUTTON PRESS DISPATCHER, MAIN CONTROLLER CYCLE
     def button_input(self, value):
         if value in valid_names:
             self.inputs.clear()
@@ -89,7 +87,7 @@ class Window:
             self.inputs.clear()
             self.queue.clear()
 
-
+### DISPLAY SYSTEM DISPATCHER
         if value == "NEXT":
             self.display_results()
             self.queue.clear()
@@ -98,7 +96,7 @@ class Window:
         else:
             self.update_view()
 
-
+### CONDITIONAL BUTTON STATE CHANGES
         if self.inputs:
             self.button_ok.config(state="normal")
             self.button_clear.config(state="normal")
@@ -115,7 +113,7 @@ class Window:
             self.button_next.config(state="disabled")
             self.button_del.config(state="disabled")
  
-
+### DISPLAY USER INTERACTION
     def update_view(self):
         to_show = []
         user_selection = ""
@@ -133,7 +131,7 @@ class Window:
         to_show.append(user_selection)
         self.interaction_label.config(text=" ".join(to_show))
 
-
+### DISPLAY QUERY RESULTS
     def display_results(self):
         all_found = self.scales_found + self.modes_found
         self.guiding_label.config(text=f'The key scales and modes for {"|".join(self.queue)} are:')
@@ -143,7 +141,7 @@ class Window:
         else:
             self.interaction_label.config(text="Nothing found...")
 
-
+### FIND MAJOR SCALES AND MODES BASED ON OBJ REFS
     def find_all(self, notes_selection):
         for scale_key, scale_notes_raw in all_scales_raw.items():
             scale_notes_corrected = all_scales_corrected[scale_key]
@@ -156,7 +154,7 @@ class Window:
                             found_mode = (f"{mode_name} mode: ", mode_notes)
                             self.modes_found.append(found_mode)
 
-
+### GUI MAIN LOOP
 root = tk.Tk()
 app = Window(root)
 root.mainloop()
