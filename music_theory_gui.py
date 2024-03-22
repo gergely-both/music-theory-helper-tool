@@ -159,7 +159,7 @@ class Window:
         """finds major scales and modes based on object references"""
         for scale_key, scale_notes_raw in all_scales_raw.items():
             scale_notes_corrected = all_scales_corrected[scale_key]
-            if set(notes_selection).issubset(set(scale_notes_raw)):
+            if set(notes_selection).issubset(scale_notes_raw):
                 found_scale = (f"{scale_key} major key: ", scale_notes_corrected)
                 self.scales_found.append(found_scale)
                 for mode_name, mode_notes in all_modes.items():

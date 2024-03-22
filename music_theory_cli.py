@@ -43,7 +43,7 @@ while not more_notes_selected:
 # MAJOR SCALE AND MODE SEARCH SYSTEM
 for scale_key, scale_notes_raw in all_scales_raw.items():
     scale_notes_corrected = all_scales_corrected[scale_key]
-    if set(user_selection).issubset(set(scale_notes_raw)):
+    if set(user_selection).issubset(scale_notes_raw):
         found_scale = (f"{scale_key} major key:", scale_notes_corrected)
         scales_found.append(found_scale)
         for mode_name, mode_notes in all_modes.items():
