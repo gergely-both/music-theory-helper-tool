@@ -1,4 +1,5 @@
-# TODO: custom typing for MusicalNote
+# TODO: custom typing, inheritance (multiple perhaps), roman numbers, inversions, name in progression, 
+
 import string
 from collections import defaultdict, namedtuple
 
@@ -39,8 +40,6 @@ class MusicalNote:
         self.step = step
         self.names = names
 
-#    def __repr__(self):
-#        return self.names
 
 class MusicalChord:
     def __init__(self, key, stage, notes):
@@ -48,15 +47,16 @@ class MusicalChord:
         self.stage = stage
         self.notes = notes
 
-    def name_chord(self): # classic repr
+    def name_chord(self):
         pass
 
-    def number_chord(self): # stage in scale
+    def number_chord(self):
         pass
 
-    def name_inversion(self): # by first note in chord
+    def name_inversion(self):
         pass
 
+    
 def find_note(x):
     if isinstance(x, str):
         for note in all_existing_notes:
@@ -83,7 +83,7 @@ def correct_name(note, signs):
         return note.names.unsigned
 
 
-# MAKING steps_names_db: 12 STEPS, ALL ENHARMONIC NAMES
+### making steps_names_db: all 12 half-steps with enharmonic names
 for x, y in zip(major_steps, names_order):
     steps_names_db[x]["unsigned"] = y
 for symbol in valid_symbols:
@@ -104,7 +104,7 @@ for step in steps_names_db:
 all_existing_notes = set(note for note in steps_notes_db.values())
 
 
-### CIRCLE OF FIFTHS, FOURTHS, SHARPS AND FLATS
+### circles of fifths, fourths, sharps and flats
 all_fifths = []
 while not (all_fifths and all_fifths[0] == all_fifths[-1] and len(all_fifths) > 1):
     if not all_fifths:
@@ -120,7 +120,7 @@ circle_of_fourths = [note.names.unsigned or note.names.flat for note in all_four
 circle_of_flats = [note.names.flat for note in all_fourths[2:9]]
 
 
-### SHARPENED / FLATTENED MAJOR SCALES START / NAME AND SHARP / FLAT MEMBERS
+### all sharp and flat scales and their signed members
 sharp_keys_sharps = {}
 flat_keys_flats = {}
 for i in range(FULL_STEPS):
@@ -133,7 +133,7 @@ for i in range(FULL_STEPS):
     flat_keys_flats[flat_scale_name] = flat_notes
 
 
-### ALL KEY NAMES AND ALL THEIR MEMBERS GEN, with objects + with correct naming system
+### all basic keys and their members, corrected names, beginning with c major
 all_scales_raw[names_order[0]] = [find_note(name) for name in names_order]
 for key, notes in all_scales_raw.items():
    all_scales_corrected[key] = [note.names.unsigned for note in notes]
@@ -154,7 +154,7 @@ for keys_signs_pairs in [sharp_keys_sharps, flat_keys_flats]:
         # all_existing_scales.add(MusicalScale(key + " major scale: ", key_notes))
 
 
-### ALL MAJOR MODES GEN: skipping ionian with 1 in range (reason: equals basic major scale)
+### all major modes, omitting ionian (is major scale)
 for i in range(1, len(major_mode_names)):
     for key_name, scale in all_scales_corrected.items():
         new_scale = scale[i:] + scale[:i]
@@ -162,7 +162,7 @@ for i in range(1, len(major_mode_names)):
         all_modes[key_name] = new_scale
 
 
-# TODO: minor/major/dim/aug 3/5/7/9/11/13 tags, inversion stages, chord progression stages, python roman numbers lib, 
+### all major and mode chord notes with name and stage
 all_thirds = {}
 all_mode_thirds = {}
 for scale, result_dict in [(all_scales_corrected, all_thirds), (all_modes, all_mode_thirds)]:
