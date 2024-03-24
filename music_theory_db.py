@@ -1,3 +1,4 @@
+# TODO: custom typing for MusicalNote
 import string
 from collections import defaultdict, namedtuple
 
@@ -13,7 +14,11 @@ major_mode_names = ["ionian", "dorian", "phrygian", "lydian", "mixolydian", "aeo
 
 steps_names_db = defaultdict(dict)
 steps_notes_db = {}
+
 all_existing_notes = set()
+all_existing_scales = set()
+all_existing_chords = set()
+
 all_scales_raw = {}
 all_scales_corrected = {}
 all_modes = {}
@@ -24,14 +29,33 @@ def find_step(name):
         if name in steps_names_db[step].values():
             return step
 
-
+class MusicalScale:
+    def __init__(self, name, notes):
+        self.name = name
+        self.notes = notes
+        
 class MusicalNote:
     def __init__(self, step, names):
         self.step = step
         self.names = names
 
-    def __repr__(self):
-        return self.names
+#    def __repr__(self):
+#        return self.names
+
+class MusicalChord:
+    def __init__(self, key, stage, notes):
+        self.key = key
+        self.stage = stage
+        self.notes = notes
+
+    def name_chord(self): # classic repr
+        pass
+
+    def number_chord(self): # stage in scale
+        pass
+
+    def name_inversion(self): # by first note in chord
+        pass
 
 def find_note(x):
     if isinstance(x, str):
@@ -127,6 +151,7 @@ for keys_signs_pairs in [sharp_keys_sharps, flat_keys_flats]:
             corrected_names.append(corrected_name)
         all_scales_raw[key] = key_notes
         all_scales_corrected[key] = corrected_names
+        # all_existing_scales.add(MusicalScale(key + " major scale: ", key_notes))
 
 
 ### ALL MAJOR MODES GEN: skipping ionian with 1 in range (reason: equals basic major scale)
@@ -137,21 +162,21 @@ for i in range(1, len(major_mode_names)):
         all_modes[key_name] = new_scale
 
 
-# TODO: minor 3/5/7/9/11/13 major aug dim tags (ii vs II) by steps in-between them
+# TODO: minor/major/dim/aug 3/5/7/9/11/13 tags, inversion stages, chord progression stages, python roman numbers lib, 
 all_thirds = {}
 all_mode_thirds = {}
-
 for scale, result_dict in [(all_scales_corrected, all_thirds), (all_modes, all_mode_thirds)]:
-    for key, values in scale.items():
+    for key, notes in scale.items():
         all_chords = []
-        for i in range(len(values)):
-            chord_notes = []
-            for j in range(0, 2*len(values), 2):
-                note = values[(i+j) % len(values)]
-                chord_notes.append(note)
-            all_chords.append(tuple(chord_notes))
+        for i in range(len(notes)):
+            single_chord = []
+            for j in range(0, 2*len(notes), 2):
+                chord_note = notes[(i+j) % len(notes)]
+                single_chord.append(chord_note)
+            all_chords.append(tuple(single_chord))
+            all_existing_chords.add(MusicalChord(key, i+1, single_chord))
         result_dict[key] = all_chords
 
-print(all_thirds)
+print([(chord.key, chord.stage, chord.notes) for chord in all_existing_chords])
 
 
