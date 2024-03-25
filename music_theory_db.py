@@ -1,4 +1,5 @@
 # TODO: custom typing, inheritance (multiple perhaps), roman numbers, inversions, name in progression, 
+# TODO: named chords system (by key and mode also?)
 
 import string
 from collections import defaultdict, namedtuple
@@ -20,10 +21,6 @@ all_existing_notes = set()
 all_existing_scales = set()
 all_existing_chords = set()
 
-all_scales_raw = {}
-all_scales_corrected = {}
-all_modes = {}
-
 
 def find_step(name):
     for step in steps_names_db:
@@ -34,12 +31,16 @@ class MusicalScale:
     def __init__(self, name, notes):
         self.name = name
         self.notes = notes
+        self.notes_mod = []
+        self.modes = []
+
+    def __repr__(self):
+        return self.name + " major scale"
         
 class MusicalNote:
     def __init__(self, step, names):
         self.step = step
         self.names = names
-
 
 class MusicalChord:
     def __init__(self, key, stage, notes):
@@ -134,10 +135,9 @@ for i in range(FULL_STEPS):
 
 
 ### all basic keys and their members, corrected names, beginning with c major
-all_scales_raw[names_order[0]] = [find_note(name) for name in names_order]
-for key, notes in all_scales_raw.items():
-   all_scales_corrected[key] = [note.names.unsigned for note in notes]
-
+new_scale_obj = MusicalScale(names_order[0], [find_note(name) for name in names_order])
+new_scale_obj.notes_mod = [note.names.unsigned for note in new_scale_obj.notes]
+all_existing_scales.add(new_scale_obj)   
 for keys_signs_pairs in [sharp_keys_sharps, flat_keys_flats]:
     for key in keys_signs_pairs:
         key_notes = []
@@ -149,34 +149,28 @@ for keys_signs_pairs in [sharp_keys_sharps, flat_keys_flats]:
             corrected_name = correct_name(note, keys_signs_pairs[key])
             key_notes.append(note)
             corrected_names.append(corrected_name)
-        all_scales_raw[key] = key_notes
-        all_scales_corrected[key] = corrected_names
-        # all_existing_scales.add(MusicalScale(key + " major scale: ", key_notes))
+        new_scale_obj = MusicalScale(key, key_notes)
+        new_scale_obj.notes_mod = corrected_names
+        all_existing_scales.add(new_scale_obj)
 
 
-### all major modes, omitting ionian (is major scale)
+### all major modes, omitting ionian (equals basic major scale)
 for i in range(1, len(major_mode_names)):
-    for key_name, scale in all_scales_corrected.items():
-        new_scale = scale[i:] + scale[:i]
-        key_name = new_scale[0] + " " + major_mode_names[i]
-        all_modes[key_name] = new_scale
+    for scale in all_existing_scales:
+        mode_notes = scale.notes_mod[i:] + scale.notes_mod[:i]
+        mode_name = mode_notes[0] + " " + major_mode_names[i]
+        scale.modes.append({mode_name: mode_notes})
 
+#print([obj.modes for obj in all_existing_scales])
 
 ### all major and mode chord notes with name and stage
-all_thirds = {}
-all_mode_thirds = {}
-for scale, result_dict in [(all_scales_corrected, all_thirds), (all_modes, all_mode_thirds)]:
-    for key, notes in scale.items():
-        all_chords = []
-        for i in range(len(notes)):
-            single_chord = []
-            for j in range(0, 2*len(notes), 2):
-                chord_note = notes[(i+j) % len(notes)]
-                single_chord.append(chord_note)
-            all_chords.append(tuple(single_chord))
-            all_existing_chords.add(MusicalChord(key, i+1, single_chord))
-        result_dict[key] = all_chords
+for scale in all_existing_scales:
+    for i in range(len(scale.notes_mod)):
+        single_chord = []
+        for j in range(0, 2*len(scale.notes_mod), 2):
+            chord_note = scale.notes_mod[(i+j) % len(scale.notes_mod)]
+            single_chord.append(chord_note)
+        all_existing_chords.add(MusicalChord(scale.name, i+1, single_chord))
 
 print([(chord.key, chord.stage, chord.notes) for chord in all_existing_chords])
-
 
