@@ -1,5 +1,4 @@
 # TODO: custom typing, inheritance (multiple perhaps), roman numbers, inversions, name in progression, 
-# TODO: named chords system (by key and mode also?)
 
 import string
 from collections import defaultdict, namedtuple
@@ -46,7 +45,8 @@ class MusicalChord:
     def __init__(self, key, stage, notes):
         self.key = key
         self.stage = stage
-        self.notes = notes
+        self.notes_mod = notes
+        self.notes = [find_note(note) for note in notes]
 
     def name_chord(self):
         pass
@@ -135,7 +135,7 @@ for i in range(FULL_STEPS):
 
 
 ### all basic keys and their members, corrected names, beginning with c major
-new_scale_obj = MusicalScale(names_order[0], [find_note(name) for name in names_order])
+new_scale_obj = MusicalScale(names_order[0] + " major scale: ", [find_note(name) for name in names_order])
 new_scale_obj.notes_mod = [note.names.unsigned for note in new_scale_obj.notes]
 all_existing_scales.add(new_scale_obj)   
 for keys_signs_pairs in [sharp_keys_sharps, flat_keys_flats]:
@@ -149,7 +149,7 @@ for keys_signs_pairs in [sharp_keys_sharps, flat_keys_flats]:
             corrected_name = correct_name(note, keys_signs_pairs[key])
             key_notes.append(note)
             corrected_names.append(corrected_name)
-        new_scale_obj = MusicalScale(key, key_notes)
+        new_scale_obj = MusicalScale(key + " major scale: ", key_notes)
         new_scale_obj.notes_mod = corrected_names
         all_existing_scales.add(new_scale_obj)
 
@@ -161,16 +161,64 @@ for i in range(1, len(major_mode_names)):
         mode_name = mode_notes[0] + " " + major_mode_names[i]
         scale.modes.append({mode_name: mode_notes})
 
-#print([obj.modes for obj in all_existing_scales])
+# for scale in all_existing_scales:
+#     for i in range(len(scale.notes_mod)):
+#         single_chord = []
+#         for j in range(0, 2*len(scale.notes_mod), 2):
+#             chord_note = scale.notes_mod[(i+j) % len(scale.notes_mod)]
+#             single_chord.append(chord_note)
+#         all_existing_chords.add(MusicalChord(scale.name, i+1, single_chord))
 
-### all major and mode chord notes with name and stage
+# for scale in all_existing_scales:
+#     for mode in scale.modes:
+#         for subname, subscale in mode.items():
+#             for i in range(len(subscale)):
+#                 single_chord = []
+#                 for j in range(0, 2*len(subscale), 2):
+#                     chord_note = subscale[(i+j) % len(subscale)]
+#                     single_chord.append(chord_note)
+#                 all_existing_chords.add(MusicalChord(subname, i+1, single_chord))
+
+### all major and mode chord scales with names and stages
+# for scale in all_existing_scales:
+#     for i in range(len(scale.notes_mod)):
+#         single_chord = []
+#         for j in range(0, 2*len(scale.notes_mod), 2):
+#             chord_note = scale.notes_mod[(i+j) % len(scale.notes_mod)]
+#             single_chord.append(chord_note)
+#         single_chord_objs = [find_note(note) for note in single_chord]
+#         stage = str(i+1) + (" minor" if (12+single_chord_objs[1].step) - (12+single_chord_objs[0].step) == 3 else " major")
+#         all_existing_chords.add(MusicalChord(scale.name, stage, single_chord))
+#     for mode in scale.modes:
+#         for subname, subscale in mode.items():
+#             for i in range(len(subscale)):
+#                 single_chord = []
+#                 for j in range(0, 2*len(subscale), 2):
+#                     chord_note = subscale[(i+j) % len(subscale)]
+#                     single_chord.append(chord_note)
+#                 single_chord_objs = [find_note(note) for note in single_chord]
+#                 stage = str(i+1) + (" minor" if (12+single_chord_objs[1].step) - (12+single_chord_objs[0].step) == 3 else " major")
+#                 all_existing_chords.add(MusicalChord(subname, stage, single_chord))
+
+# print([(chord.key, chord.stage, chord.notes_mod) for chord in all_existing_chords])
+
+def generate_chords(scale_notes, scale_name):
+    """Generate chords based on scale notes and scale name."""
+    for i in range(len(scale_notes)):
+        single_chord = [scale_notes[(i+j) % len(scale_notes)] for j in range(0, 2*len(scale_notes), 2)]
+        single_chord_objs = [find_note(note) for note in single_chord]
+        stage = str(i+1) + (" minor" if ((12+single_chord_objs[1].step) - (12+single_chord_objs[0].step)) % 12 == 3 else " major")
+        all_existing_chords.add(MusicalChord(scale_name, stage, single_chord))
+
+# Iterate over all major and mode chord scales with names and stages
 for scale in all_existing_scales:
-    for i in range(len(scale.notes_mod)):
-        single_chord = []
-        for j in range(0, 2*len(scale.notes_mod), 2):
-            chord_note = scale.notes_mod[(i+j) % len(scale.notes_mod)]
-            single_chord.append(chord_note)
-        all_existing_chords.add(MusicalChord(scale.name, i+1, single_chord))
+    # Generate chords for the main scale
+    generate_chords(scale.notes_mod, scale.name)
+    
+    # Generate chords for each mode in the scale
+    for mode in scale.modes:
+        for subname, subscale in mode.items():
+            generate_chords(subscale, subname)
 
-print([(chord.key, chord.stage, chord.notes) for chord in all_existing_chords])
-
+# Print all existing chords
+#print([(chord.key, chord.stage, chord.notes_mod) for chord in all_existing_chords])
