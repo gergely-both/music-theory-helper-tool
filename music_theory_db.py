@@ -1,4 +1,4 @@
-# TODO: custom typing, inheritance (multiple perhaps), inversions def, name in progression for augmented and diminished chords, 
+# TODO: custom typing options, chord inversions definition, symbol to name in progression for augmented and diminished chords, 
 
 import string
 from collections import defaultdict, namedtuple
@@ -16,6 +16,12 @@ steps_notes_db = {}
 all_existing_notes = set()
 all_existing_scales = set()
 all_existing_chords = set()
+
+
+# arabic to roman numerals
+def arabic_to_roman(n):
+    numerals = ["I", "II", "III", "IV", "V", "VI", "VII"]
+    return numerals[n-1]
 
 
 class MusicalScale:
@@ -72,19 +78,9 @@ class MusicalChord:
         self.notes_mod = notes
         self.notes = [MusicalNote.find_note(note) for note in notes]
     
-    @classmethod
-    def steps_diff(cls, note_low, note_hi):
+    @staticmethod
+    def steps_diff(note_low, note_hi):
         return (12 + note_hi.step - note_low.step) % 12
-
-    def name_chord(self):
-        pass
-
-    def number_chord(self):
-        pass
-
-    def name_inversion(self):
-        pass
-
 
 
 ### making steps_names_db: all 12 half-steps with enharmonic names
@@ -164,10 +160,7 @@ for i in range(1, len(major_mode_names)):
         mode_name = mode_notes[0] + " " + major_mode_names[i]
         scale.modes.append({mode_name: mode_notes})
 
-# arabic to roman numerals
-def arabic_to_roman(n):
-    numerals = ["I", "II", "III", "IV", "V", "VI", "VII"]
-    return numerals[n-1]
+
 
 def generate_chords(scale_notes, scale_name):
     """Generate chords based on scale notes and scale name."""
