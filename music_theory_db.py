@@ -180,8 +180,8 @@ for keys_signs_pairs in [sharp_keys_sharps, flat_keys_flats]:
 
 
 ### making all modes for each major scale as their instance attributes
-for i in range(1, len(major_mode_names)):
-    for scale in all_existing_scales:
+for scale in all_existing_scales:
+    for i in range(1, len(major_mode_names)):
         mode_notes = scale.notes_mod[i:] + scale.notes_mod[:i]
         mode_name = mode_notes[0] + " " + major_mode_names[i]
         scale.modes.append({mode_name: mode_notes})
@@ -206,4 +206,4 @@ for scale in all_existing_scales:
             generate_chords(subscale, subname)
 
 # Print all existing chords
-[print(chord.key, chord.degree_mod, chord.notes_mod) for chord in all_existing_chords]
+# [print(chord.key, chord.degree_mod, chord.notes_mod) for chord in all_existing_chords]

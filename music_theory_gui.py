@@ -158,22 +158,6 @@ class Window:
             self.interaction_label.config(text="Nothing found...")
 
 
-# NOTE: made edit for changed music_theory_db.py variables and methods, old code below:
-    # def find_all(self, notes_selection: List[MusicalNote]) -> None:
-    #     """finds major scales and modes based on object references"""
-    #     for scale_key, scale_notes_raw in all_scales_raw.items():
-    #         scale_notes_corrected = all_scales_corrected[scale_key]
-    #         if set(notes_selection).issubset(scale_notes_raw):
-    #             found_scale = (f"{scale_key} major key: ", scale_notes_corrected)
-    #             self.scales_found.append(found_scale)
-    #             for mode_name, mode_notes in all_modes.items():
-    #                 if set(scale_notes_corrected) == set(mode_notes):
-    #                     if any(name == mode_notes[0] for name in notes_selection[0].names):
-    #                         found_mode = (f"{mode_name} mode: ", mode_notes)
-    #                         self.modes_found.append(found_mode)
-
-
-# TODO: check if updated find_all method works with the new music_theory_db.py, and how it compares to the old one
     def find_all(self, notes_selection: List[MusicalNote]) -> None:
         """finds major scales and modes based on object references"""
         for scale in all_existing_scales:
