@@ -1,9 +1,9 @@
 import tkinter as tk
 from typing import List
-from music_theory_db import MusicalNote, find_note, valid_names, valid_symbols, all_scales_raw, all_scales_corrected, all_modes
+from music_theory_db import MusicalNote, valid_names, valid_symbols, all_existing_scales
 
 
-### TKINTER BUTTON PARAMS
+### tkinter button properties for the window object
 button_properties = {
 "width": 3,
 "relief": "raised",
@@ -11,10 +11,12 @@ button_properties = {
 
 
 class Window:
-    """tkinter window elements, attributes etc."""
+    """Tkinter window with buttons for user interaction and display for results."""
     def __init__(self, master):
         self.master = master
         self.master.title("Music Theory Helper Tool")
+
+        # below tries to center the window on the screen:
         # self.master.geometry("400x400")
         # self.master.resizable(0, 0)
         # self.screenwidth = master.winfo_screenwidth()
@@ -55,6 +57,7 @@ class Window:
         self.button_restart = tk.Button(master, text="restart", state="normal", command=lambda: self.button_input("restart"), **button_properties)
         self.button_restart.grid(row=7, column=0, columnspan=7)
 
+        # instance attributes for user inputs and query results
         self.inputs = []
         self.queue = []
         self.scales_found = []
@@ -62,7 +65,7 @@ class Window:
 
 
     def button_input(self, value: str) -> None:
-        """button press dispatcher, main controller cycle"""
+        """Main control cycle and button input handling."""
         if value in valid_names:
             self.inputs.clear()
             self.inputs.append(value)
@@ -81,7 +84,7 @@ class Window:
                 self.queue.append(note_name)
             self.inputs.clear()
         elif value == "NEXT":
-            notes_selection = [find_note(note_name) for note_name in self.queue]
+            notes_selection = [MusicalNote.find_note(note_name) for note_name in self.queue]
             self.find_all(notes_selection)
         elif value == "del" and self.queue:
             del self.queue[-1]
@@ -96,7 +99,7 @@ class Window:
 
 
     def display_dispatch(self, value: str) -> None:
-        """dispatches to display fn to show query results xor interactions"""
+        """Dispatches to display functions for user interaction xor query results."""
         if value == "NEXT":
             self.display_result()
             self.queue.clear()
@@ -107,7 +110,7 @@ class Window:
 
 
     def buttons_flip(self) -> None:
-        """changes button states by conditions"""
+        """Changes button states based on user inputs and queue state."""
         if self.inputs:
             self.button_ok.config(state="normal")
             self.button_clear.config(state="normal")
@@ -126,7 +129,7 @@ class Window:
  
 
     def display_interaction(self) -> None:
-        """displays user interaction"""
+        """Displays user interaction based on inputs and queue state"""
         to_show = []
         user_selection = ""
         if self.queue:
@@ -145,7 +148,7 @@ class Window:
 
 
     def display_result(self) -> None:
-        """displays query results"""
+        """Displays query results of user interaction."""
         all_found = self.scales_found + self.modes_found
         self.guiding_label.config(text=f'The key scales and modes for {"|".join(self.queue)} are:')
         if all_found:
@@ -155,21 +158,39 @@ class Window:
             self.interaction_label.config(text="Nothing found...")
 
 
+# NOTE: made edit for changed music_theory_db.py variables and methods, old code below:
+    # def find_all(self, notes_selection: List[MusicalNote]) -> None:
+    #     """finds major scales and modes based on object references"""
+    #     for scale_key, scale_notes_raw in all_scales_raw.items():
+    #         scale_notes_corrected = all_scales_corrected[scale_key]
+    #         if set(notes_selection).issubset(scale_notes_raw):
+    #             found_scale = (f"{scale_key} major key: ", scale_notes_corrected)
+    #             self.scales_found.append(found_scale)
+    #             for mode_name, mode_notes in all_modes.items():
+    #                 if set(scale_notes_corrected) == set(mode_notes):
+    #                     if any(name == mode_notes[0] for name in notes_selection[0].names):
+    #                         found_mode = (f"{mode_name} mode: ", mode_notes)
+    #                         self.modes_found.append(found_mode)
+
+
+# TODO: check if updated find_all method works with the new music_theory_db.py, and how it compares to the old one
     def find_all(self, notes_selection: List[MusicalNote]) -> None:
         """finds major scales and modes based on object references"""
-        for scale_key, scale_notes_raw in all_scales_raw.items():
-            scale_notes_corrected = all_scales_corrected[scale_key]
-            if set(notes_selection).issubset(scale_notes_raw):
-                found_scale = (f"{scale_key} major key: ", scale_notes_corrected)
+        for scale in all_existing_scales:
+            if set(notes_selection).issubset(scale.notes):
+                found_scale = (f"{scale.name} major key: ", scale.notes_mod)
                 self.scales_found.append(found_scale)
-                for mode_name, mode_notes in all_modes.items():
-                    if set(scale_notes_corrected) == set(mode_notes):
+                for mode in scale.modes:
+                    mode_name = list(mode.keys())[0]
+                    mode_notes = list(mode.values())[0]
+                    if set(scale.notes_mod) == set(mode_notes):
                         if any(name == mode_notes[0] for name in notes_selection[0].names):
                             found_mode = (f"{mode_name} mode: ", mode_notes)
                             self.modes_found.append(found_mode)
 
 
-root = tk.Tk()
-app = Window(root)
-root.mainloop()
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = Window(root)
+    root.mainloop()
 
