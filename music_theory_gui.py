@@ -9,7 +9,7 @@ button_properties = {
 "relief": "raised",
 }
 
-
+# NOTE: make window centered on the screen, make window resizable, if possible
 class Window:
     """Tkinter window with buttons for user interaction and display for results."""
     def __init__(self, master):
@@ -159,7 +159,7 @@ class Window:
 
 
     def find_all(self, notes_selection: List[MusicalNote]) -> None:
-        """finds major scales and modes based on object references"""
+        """Finds major scales and modes based on user MusicalNote objects selection."""
         for scale in all_existing_scales:
             if set(notes_selection).issubset(scale.notes):
                 found_scale = (f"{scale.name} major key: ", scale.notes_mod)
