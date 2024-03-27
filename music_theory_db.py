@@ -1,18 +1,24 @@
-# TODO: custom typing options, chord inversions definition, symbol to name in progression for augmented and diminished chords, 
+# TODO: custom typing options, chord inversions definition if applicable, 
 
 import string
 from collections import defaultdict, namedtuple
 
+
 FULL_STEPS = 7
 HALF_STEPS = 12
+
 Names = namedtuple("Names", "unsigned flat sharp")
+
 valid_names = string.ascii_uppercase[:FULL_STEPS]
 names_order = valid_names[2:] + valid_names[:2]
 valid_symbols = {"b": -1, "#": +1}
+
 major_steps = [0, 2, 4, 5, 7, 9, 11]
 major_mode_names = ["ionian", "dorian", "phrygian", "lydian", "mixolydian", "aeolian / minor", "locrian"]
+
 steps_names_db = defaultdict(dict)
 steps_notes_db = {}
+
 all_existing_notes = set()
 all_existing_scales = set()
 all_existing_chords = set()
@@ -33,6 +39,7 @@ class MusicalScale:
 
     def __repr__(self):
         return self.name + " major scale"
+
 
 class MusicalNote:
     def __init__(self, step, names):
@@ -71,16 +78,30 @@ class MusicalNote:
         else:
             return note.names.unsigned
 
+
 class MusicalChord:
     def __init__(self, key, degree, notes):
         self.key = key
         self.degree = degree
+        self.degree_mod = None
         self.notes_mod = notes
         self.notes = [MusicalNote.find_note(note) for note in notes]
-    
+        self.detect_degree()
+
     @staticmethod
     def steps_diff(note_low, note_hi):
         return (12 + note_hi.step - note_low.step) % 12
+
+    def detect_degree(self):
+        third = self.steps_diff(self.notes[0], self.notes[1])
+        fifth = self.steps_diff(self.notes[0], self.notes[2])
+        degree_roman = arabic_to_roman(self.degree).upper() if third == 4 else arabic_to_roman(self.degree).lower()
+        symbol = None
+        if fifth > 7:
+            symbol = "+"
+        elif fifth < 7:
+            symbol = "°"
+        self.degree_mod = degree_roman + symbol if symbol else degree_roman
 
 
 ### making steps_names_db: all 12 half-steps with enharmonic names
@@ -161,13 +182,11 @@ for i in range(1, len(major_mode_names)):
         scale.modes.append({mode_name: mode_notes})
 
 
-
 def generate_chords(scale_notes, scale_name):
     """Generate chords based on scale notes and scale name."""
     for i in range(len(scale_notes)):
         single_chord = [scale_notes[(i+j) % len(scale_notes)] for j in range(0, 2*len(scale_notes), 2)]
-        single_chord_objs = [MusicalNote.find_note(note) for note in single_chord]
-        degree = (arabic_to_roman(i+1)).lower() if MusicalChord.steps_diff(single_chord_objs[0], single_chord_objs[1]) == 3 else arabic_to_roman(i+1).upper()
+        degree = i+1
         all_existing_chords.add(MusicalChord(scale_name, degree, single_chord))
 
 # Iterate over all major and mode chord scales with names and degrees
@@ -181,5 +200,4 @@ for scale in all_existing_scales:
             generate_chords(subscale, subname)
 
 # Print all existing chords
-print([(chord.key, chord.degree, chord.notes_mod) for chord in all_existing_chords])
-
+print([(chord.key, chord.degree_mod, chord.notes_mod) for chord in all_existing_chords])
