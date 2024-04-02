@@ -41,12 +41,14 @@ while not note_selected:
         note_selected = True
     else:
         print("Try something different.")
-           
+
 
 # entering additional notes
 more_notes_selected = False
 while not more_notes_selected:
-    response_2 = input("Enter additional notes you know play well alongside (comma-separated): ").title()
+    response_2 = input(
+        "Enter additional notes you know play well alongside (comma-separated): "
+    ).title()
     response_2 = set(x.strip() for x in response_2.split(","))
     more_notes = [MusicalNote.find_note(name) for name in response_2]
     if all(more_notes):
