@@ -241,16 +241,16 @@ class Window:
         """Finds major scales and modes based on user MusicalNote objects selection."""
         for scale in all_existing_scales:
             if set(notes_selection).issubset(scale.notes):
-                found_scale = (f"{scale.name} major key: ", scale.notes_mod)
+                found_scale = (f"{scale.key}: ", scale.notes_readable)
                 self.scales_found.append(found_scale)
                 for mode in scale.modes:
                     mode_name = list(mode.keys())[0]
                     mode_notes = list(mode.values())[0]
-                    if set(scale.notes_mod) == set(mode_notes):
+                    if set(scale.notes_readable) == set(mode_notes):
                         if any(
-                            name == mode_notes[0] for name in notes_selection[0].names
+                            name == mode_notes[0] for name in notes_selection[0].enharmonics
                         ):
-                            found_mode = (f"{mode_name} mode: ", mode_notes)
+                            found_mode = (f"{mode_name}: ", mode_notes)
                             self.modes_found.append(found_mode)
 
 
