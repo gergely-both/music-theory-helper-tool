@@ -1,34 +1,55 @@
-from music_theory_db import MusicalNote, all_existing_scales
+# TODO: output formatting improvements
+
+from music_theory_db import MusicalNote, MusicalScale, MusicalMode, MusicalChord
 from typing import List
 
 
+user_selection = []
+
 scales_found = []
 modes_found = []
-user_selection = []
+chords_found = []
 
 
 def find_all(notes_selection: List[MusicalNote]) -> None:
-    """Finds major scales and modes based on user MusicalNote objects selection."""
-    for scale in all_existing_scales:
+    """Finds scales and modes by user MusicalNote objects selection."""
+    
+    for scale in MusicalScale.all_existing_scales:
         if set(notes_selection).issubset(scale.notes):
-            found_scale = (f"{scale.key}: ", scale.notes_readable)
-            scales_found.append(found_scale)
-            for mode in scale.modes:
-                mode_name = list(mode.keys())[0]
-                mode_notes = list(mode.values())[0]
-                if set(scale.notes_readable) == set(mode_notes):
-                    if any(name == mode_notes[0] for name in notes_selection[0].enharmonics):
-                        found_mode = (f"{mode_name}: ", mode_notes)
-                        modes_found.append(found_mode)
+            if notes_selection[0] is scale.notes[0]:
+                scales_found.insert(0, scale)
+            else:
+                scales_found.append(scale)
+
+    for scale in scales_found:
+        for mode in MusicalMode.all_existing_modes:
+            if set(scale.notes_readable) == set(mode.notes_readable):
+                if any(name == mode.notes_readable[0] for name in notes_selection[0].enharmonics):
+                    modes_found.append(mode)
+        for chord in MusicalChord.all_existing_chords:
+            if chord.key == scale.key:
+                chords_found.append(chord)
+
+    for mode in modes_found:
+        for chord in MusicalChord.all_existing_chords:
+            if chord.key == mode.key:
+                chords_found.append(chord)
 
 
 def display_results():
     """Displays query results of user interaction."""
-    all_found = scales_found + modes_found
-    if all_found:
-        for key_text, notes in all_found:
-            scale = ", ".join(notes)
-            print(key_text, scale)
+    if scales_found:
+        print("\nProper scales correlated:")
+        for scale in scales_found:
+            print(scale.key + ": " + ", ".join(scale.notes_readable))
+    if modes_found:
+        print("\nThe following modes are available:")
+        for mode in modes_found:
+            print(mode.key + ": " + ", ".join(mode.notes_readable))
+    if chords_found:
+        print("\nThe following chords are available:")
+        for chord in chords_found:
+            print(chord.key + " - " + chord.degree_fmt + ": " + ", ".join(chord.notes_readable))
 
 
 def notes_input_mode():

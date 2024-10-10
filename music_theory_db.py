@@ -1,14 +1,12 @@
-# TODO: correct fmt of ninth / eleventh / thirteenth / sus / inversions...
+# TODO: correct fmt of ninth / eleventh / thirteenth / sus / inversions
 
 import string
 from collections import defaultdict, namedtuple
 from typing import List, Dict
 
-
 MAIN_STEPS = 7
 ALL_STEPS = 12
 OCTAVES_RANGE = 8
-
 
 valid_names = string.ascii_uppercase[:MAIN_STEPS]
 names_order = valid_names[2:] + valid_names[:2]
@@ -29,35 +27,33 @@ major_mode_names = [
 steps_names_db = defaultdict(dict)
 steps_notes_db = {}
 
-all_existing_notes = set()
-all_existing_scales = set()
-all_existing_chords = set()
-
 
 class MusicalNote:
     """Musical note with its step and names."""
+    all_existing_notes = set()
 
     def __init__(self, step: int, names: Names):
         self.step = step
         self.all_steps : List[int] = [step+(x*ALL_STEPS) for x in range(OCTAVES_RANGE)]      
         self.enharmonics = names
+        MusicalNote.all_existing_notes.add(self)
 
     @staticmethod
-    def find_step(name) -> int:
+    def find_step(name: str) -> int:
         """Find the step of the note by its name."""
         for step in steps_names_db:
             if name in steps_names_db[step].values():
                 return step
 
     @staticmethod
-    def find_note(x):
+    def find_note(x: str | int):
         """Find the note by its name or step."""
         if isinstance(x, str):
-            for note in all_existing_notes:
+            for note in MusicalNote.all_existing_notes:
                 if x in note.enharmonics:
                     return note
         elif isinstance(x, int):
-            for note in all_existing_notes:
+            for note in MusicalNote.all_existing_notes:
                 if x == note.step:
                     return note
 
@@ -73,25 +69,38 @@ class MusicalNote:
 
 
 class MusicalScale:
-    """Musical scale with its name and notes."""
+    """Musical scale with its key name and notes."""
+    all_existing_scales = set()
 
-    def __init__(self, key: str, notes: MusicalNote):
+    def __init__(self, key: MusicalNote, notes: List[MusicalNote]):
         self.key = key + " major / ionian"
         self.notes = notes
         self.notes_readable : List[str]= []
-        self.modes : Dict[str, str] = []
+        MusicalScale.all_existing_scales.add(self)
+
+
+class MusicalMode:
+    """"Musical mode with its key name and notes."""
+    all_existing_modes = set()
+
+    def __init__(self, key: MusicalNote, notes_readable: List[str]):
+        self.key = key
+        self.notes_readable = notes_readable
+        MusicalMode.all_existing_modes.add(self)
 
 
 class MusicalChord:
     """Musical chord with its key, degree, and notes."""
+    all_existing_chords = set()
 
-    def __init__(self, key: str, degree, notes):
+    def __init__(self, key: MusicalNote, degree, notes):
         self.key = key
         self.degree = degree
         self.degree_fmt = None
         self.notes_readable = notes
         self.notes = [MusicalNote.find_note(note) for note in notes]
         self.detect_degree()
+        MusicalChord.all_existing_chords.add(self)
 
     # arabic to roman numerals
     @staticmethod
@@ -126,7 +135,7 @@ class MusicalChord:
         self.degree_fmt = degree_roman + symbol if symbol else degree_roman
 
     @staticmethod
-    def generate_chords(scale_notes, key):
+    def generate_chords(key, scale_notes):
         """Generate chords based on scale notes and scale name."""
         for i in range(len(scale_notes)):
             single_chord = [
@@ -134,7 +143,7 @@ class MusicalChord:
                 for j in range(0, 2 * len(scale_notes), 2)
             ]
             degree = i + 1
-            all_existing_chords.add(MusicalChord(key, degree, single_chord))
+            MusicalChord(key, degree, single_chord)
 
 
 # CREATING MusicalNote OBJECTS 
@@ -155,7 +164,6 @@ for step in steps_names_db:
     flat = steps_names_db[step].get("b")
     sharp = steps_names_db[step].get("#")
     steps_notes_db[step] = MusicalNote(step, Names(unsigned, flat, sharp))
-all_existing_notes = set(note for note in steps_notes_db.values())
 
 
 # CREATING CIRCLES AS LISTS OF STRINGS
@@ -195,7 +203,6 @@ for i in range(MAIN_STEPS):
 ### the unsigned c major scale
 new_scale_obj = MusicalScale(names_order[0], [MusicalNote.find_note(name) for name in names_order])
 new_scale_obj.notes_readable = [note.enharmonics.unsigned for note in new_scale_obj.notes]
-all_existing_scales.add(new_scale_obj)
 ### sharp and flat major scales
 for keys_signs_pairs in [sharp_keys_sharp_notes, flat_keys_flat_notes]:
     for key in keys_signs_pairs:
@@ -210,24 +217,23 @@ for keys_signs_pairs in [sharp_keys_sharp_notes, flat_keys_flat_notes]:
             corrected_names.append(appropriate_name)
         new_scale_obj = MusicalScale(key, keys_notes)
         new_scale_obj.notes_readable = corrected_names
-        all_existing_scales.add(new_scale_obj)
 
 
 # CREATING MODES FOR SCALES AND ATTRIBUTING THEM
-for scale in all_existing_scales:
+for scale in MusicalScale.all_existing_scales:
     for i in range(1, len(major_mode_names)):
         mode_notes = scale.notes_readable[i:] + scale.notes_readable[:i]
         mode_name = mode_notes[0] + " " + major_mode_names[i]
-        scale.modes.append({mode_name: mode_notes})
+        MusicalMode(mode_name, mode_notes)
+        # scale.modes.append({mode_name: mode_notes})
 
 
 # CREATING CHORD DEGREES FOR SCALES AND THEIR MODES
-for scale in all_existing_scales:
-    MusicalChord.generate_chords(scale.notes_readable, scale.key)
-    for mode in scale.modes:
-        for subname, subscale in mode.items():
-            MusicalChord.generate_chords(subscale, subname)
+for scale in MusicalScale.all_existing_scales:
+    MusicalChord.generate_chords(scale.key, scale.notes_readable)
+for mode in MusicalMode.all_existing_modes:
+    MusicalChord.generate_chords(mode.key, mode.notes_readable)
 
 
-# print([(chord.key, chord.degree_fmt, chord.notes_readable) for chord in all_existing_chords])
-# print([(scale.key, scale.notes_readable, scale.modes) for scale in all_existing_scales])
+# print([(chord.key, chord.degree_fmt, chord.notes_readable) for chord in MusicalChord.all_existing_chords])
+# print([(scale.key, scale.notes_readable, scale.modes) for scale in MusicalScale.all_existing_scales])
