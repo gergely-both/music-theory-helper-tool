@@ -1,14 +1,14 @@
 # Music Theory Helper Tool
-General purpose music theory Python GUI and CLI application.
+Music theory Python application (CLI + GUI) to help with chaining notes into scales, modes and chords.
 
 ### Current features
-Outputs matching scale notes by detecting all major keys and musical modes the user's notes selection includes.
+- shows scales, modes and chords matching user input
+- shows chords degrees for scales, modes and chords found
 
-### In development
-Chord functionality exists in database, not utilized in GUI yet.
-
-### Future features
-Will be expanded to include chord progressions and inversions by utilizing guitar tab and piano keys view in the GUI.
+### Upcoming features
+- chord inversions
+- chord progressions
+- tabulature (CLI) and guitar/piano view (GUI)
 
 ### Running
 Run `python3 -m music_theory_cli` for the command line interface version or `python3 -m music_theory_gui` for the graphical user interface version. The GUI requires Tkinter to work.

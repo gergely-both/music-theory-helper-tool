@@ -1,6 +1,15 @@
+# TODO: make window centered on the screen + make window resizable(?), make output scrollable
+
 import tkinter as tk
 from typing import List
-from music_theory_db import MusicalNote, valid_names, valid_symbols, all_existing_scales
+from music_theory_db import (
+    valid_names,
+    valid_symbols,
+    MusicalNote,
+    MusicalScale,
+    MusicalMode,
+    MusicalChord,
+)
 
 
 # tkinter button properties for the window object
@@ -10,7 +19,6 @@ button_properties = {
 }
 
 
-# NOTE: make window centered on the screen, make window resizable, if possible
 class Window:
     """Tkinter window with buttons for user interaction and display for results."""
 
@@ -30,7 +38,7 @@ class Window:
             master, text="Enter the starting / base note:", height=5
         )
         self.guiding_label.grid(row=0, columnspan=7)
-        self.interaction_label = tk.Label(master, height=25)
+        self.interaction_label = tk.Label(master, height=50)
         self.interaction_label.grid(row=1, column=0, columnspan=7)
         self.button_c = tk.Button(
             master,
@@ -141,6 +149,7 @@ class Window:
         self.queue = []
         self.scales_found = []
         self.modes_found = []
+        self.chords_found = []
 
     def button_input(self, value: str) -> None:
         """Main control cycle and button input handling."""
@@ -208,7 +217,7 @@ class Window:
     def display_interaction(self) -> None:
         """Displays user interaction based on inputs and queue state"""
         to_show = []
-        user_selection = ""
+        user_selection = str()
         if self.queue:
             self.guiding_label.config(
                 text="Enter additional notes that belong together:"
@@ -227,31 +236,59 @@ class Window:
 
     def display_result(self) -> None:
         """Displays query results of user interaction."""
-        all_found = self.scales_found + self.modes_found
         self.guiding_label.config(
-            text=f'The key scales and modes for {"|".join(self.queue)} are:'
+            text=f'The key scales and modes for {" | ".join(self.queue)} are:'
         )
-        if all_found:
-            to_output = [key + ", ".join(notes) for key, notes in all_found]
-            self.interaction_label.config(text="\n".join(to_output))
+        output_queue = []
+        if self.scales_found:
+            output_queue.append("\nProper scales correlated:")
+            for scale in self.scales_found:
+                output_queue.append(scale.key + ": " + ", ".join(scale.notes_readable))
+        if self.modes_found:
+            output_queue.append("\nThe following modes are available:")
+            for mode in self.modes_found:
+                output_queue.append(mode.key + ": " + ", ".join(mode.notes_readable))
+        if self.chords_found:
+            output_queue.append("\nThe following chords are available:")
+            for chord in self.chords_found:
+                output_queue.append(
+                    chord.key
+                    + " - "
+                    + chord.degree_fmt
+                    + ": "
+                    + ", ".join(chord.notes_readable)
+                )
+
+        if output_queue:
+            self.interaction_label.config(text="\n".join(output_queue))
         else:
             self.interaction_label.config(text="Nothing found...")
 
     def find_all(self, notes_selection: List[MusicalNote]) -> None:
         """Finds major scales and modes based on user MusicalNote objects selection."""
-        for scale in all_existing_scales:
-            if set(notes_selection).issubset(scale.notes):
-                found_scale = (f"{scale.key}: ", scale.notes_readable)
-                self.scales_found.append(found_scale)
-                for mode in scale.modes:
-                    mode_name = list(mode.keys())[0]
-                    mode_notes = list(mode.values())[0]
-                    if set(scale.notes_readable) == set(mode_notes):
-                        if any(
-                            name == mode_notes[0] for name in notes_selection[0].enharmonics
-                        ):
-                            found_mode = (f"{mode_name}: ", mode_notes)
-                            self.modes_found.append(found_mode)
+        for scale in MusicalScale.all_existing_scales:
+            if (
+                set(notes_selection).issubset(scale.notes)
+                and notes_selection[0] is scale.notes[0]
+            ):
+                self.scales_found.append(scale)
+
+        # looking up matching modes (ionian excluded)
+        for mode in MusicalMode.all_existing_modes:
+            if (
+                set(notes_selection).issubset(mode.notes)
+                and notes_selection[0] is mode.notes[0]
+            ):
+                self.modes_found.append(mode)
+
+        # looking up corresponding chords for scales and modes found above, by key
+        for chord in MusicalChord.all_existing_chords:
+            for scale in self.scales_found:
+                if chord.key == scale.key:
+                    self.chords_found.append(chord)
+            for mode in self.modes_found:
+                if chord.key == mode.key:
+                    self.chords_found.append(chord)
 
 
 if __name__ == "__main__":

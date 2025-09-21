@@ -8,43 +8,65 @@ modes_found = []
 chords_found = []
 
 
-# NOTE: is len(scales_found) always == 1 info
-def find_all(notes_selection: List[MusicalNote]) -> None:
-    """Finds scales and modes by user MusicalNote objects selection."""
-    # finding exact scale matches for first note exactly and others' subset
+def interface_user():
+    """Interacts with user, understanding their input."""
+    # entering the starting note
+    note_selected = False
+    while not note_selected:
+        response = input("Enter starting note: ").title()
+        starting_note = MusicalNote.find_note(response)
+        if starting_note:
+            user_selection.append(starting_note)
+            note_selected = True
+        else:
+            print("Try something different.")
+
+    # entering additional notes
+    more_notes_selected = False
+    while not more_notes_selected:
+        response_2_raw = input(
+            "Enter additional notes you know play well alongside (comma-separated): "
+        ).title()
+        response_2 = set(x.strip() for x in response_2_raw.split(","))
+        more_notes = [MusicalNote.find_note(name) for name in response_2]
+        if all(more_notes):
+            user_selection.extend(more_notes)
+            more_notes_selected = True
+        else:
+            print("Something's incorrect. Try again.")
+    return True
+
+
+def query_db(notes_selection: List[MusicalNote]) -> None:
+    """Finds scales, modes and chords for user note selection, collects them by type."""
+    # looking up matching scales (aka ionian modes)
     for scale in MusicalScale.all_existing_scales:
         if (
             set(notes_selection).issubset(scale.notes)
             and notes_selection[0] is scale.notes[0]
         ):
             scales_found.append(scale)
-            # print(scale.key)
 
-    # finding modes by first note matches and others' subsets
+    # looking up matching modes (ionian excluded)
     for mode in MusicalMode.all_existing_modes:
-        if set(notes_selection).issubset(mode.notes):
-            if any(
-                name == mode.notes_readable[0] for name in user_selection[0].enharmonics
-            ):
-                modes_found.append(mode)
-                # print(mode.key)
+        if (
+            set(notes_selection).issubset(mode.notes)
+            and notes_selection[0] is mode.notes[0]
+        ):
+            modes_found.append(mode)
 
-    # finding chords of same key among found scales
-    for scale in scales_found:
-        for chord in MusicalChord.all_existing_chords:
+    # looking up corresponding chords for scales and modes found above, by key
+    for chord in MusicalChord.all_existing_chords:
+        for scale in scales_found:
             if chord.key == scale.key:
                 chords_found.append(chord)
-
-    # finding chords of same key among found modes
-    for mode in modes_found:
-        for chord in MusicalChord.all_existing_chords:
+        for mode in modes_found:
             if chord.key == mode.key:
                 chords_found.append(chord)
 
 
-# TODO: output formatting improvements
 def display_results():
-    """Displays query results of user interaction."""
+    """Displays db feedback for user interaction."""
     if scales_found:
         print("\nProper scales correlated:")
         for scale in scales_found:
@@ -65,36 +87,7 @@ def display_results():
             )
 
 
-def notes_input_mode():
-    # entering the starting note
-    note_selected = False
-    while not note_selected:
-        response = input("Enter starting note: ").title()
-        starting_note = MusicalNote.find_note(response)
-        if starting_note:
-            user_selection.append(starting_note)
-            note_selected = True
-        else:
-            print("Try something different.")
-
-    # TODO: revise
-    # entering additional notes
-    more_notes_selected = False
-    while not more_notes_selected:
-        response_2 = input(
-            "Enter additional notes you know play well alongside (comma-separated): "
-        ).title()
-        other_notes = set(x.strip() for x in response_2.split(","))
-        more_notes = [MusicalNote.find_note(name) for name in other_notes]
-        if all(more_notes):
-            user_selection.extend(more_notes)
-            more_notes_selected = True
-        else:
-            print("Something's incorrect. Try again.")
-    return True
-
-
 if __name__ == "__main__":
-    notes_input_mode()
-    find_all(user_selection)
+    interface_user()
+    query_db(user_selection)
     display_results()
